@@ -11,3 +11,31 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Pessoa {
+  id Int @id @default(autoincrement())
+  nome String
+  indisponibilidades Indisponibilidade[]
+
+  @@map("pessoa")
+}
+
+model Culto {
+  id Int @id @default(autoincrement())
+  nome String
+  data DateTime
+  indisponibilidades Indisponibilidade[]
+
+  @@map("culto")
+}
+
+model Indisponibilidade {
+  pessoa Pessoa @relation(fields: [pessoaId], references: [id])
+  culto Culto @relation(fields: [cultoId], references: [id])
+
+  cultoId Int 
+  pessoaId Int
+
+  @@map("indisponibilidade")
+  @@id([pessoaId, cultoId])
+}
