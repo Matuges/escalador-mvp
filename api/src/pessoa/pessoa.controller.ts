@@ -32,7 +32,10 @@ export class PessoaController {
         return this.pessoaService.delete(id)
     }
     
-
+    @Get(':id/disponibilidades')
+    async findDisponibilidade(@Param('id', ParseIntPipe) id: number) {
+        return this.pessoaService.findDisponibilidade(id)
+    } 
     
 
 }

@@ -46,4 +46,22 @@ export class PessoaService {
             }
         })
     }
+
+    async findDisponibilidade(id: number) {
+        const cultos = await this.prisma.culto.findMany({
+            include: {
+                indisponibilidades: {
+                    where: {pessoaId: id}
+                }
+            }      
+        })
+
+        return (cultos).map((culto) => ({
+            culto: culto.nome,
+            id: culto.id,
+            data: culto.data,
+            disponivel: culto.indisponibilidades.length === 0 
+        }))
+    }
 }
+
