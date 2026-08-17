@@ -45,7 +45,7 @@ Jest config for unit tests lives inline in `api/package.json` (`rootDir: src`, m
 
 Estou construindo, como desenvolvedor solo, um sistema web que futuramente vai gerar escalas de serviço de uma igreja automaticamente. Este é o primeiro MVP, deliberadamente mínimo. Não implemente nada além do escopo abaixo.
 
-Escopo do MVP: apenas registrar e consultar a disponibilidade de pessoas para cultos. Três entidades: Pessoa (só nome), Culto (data e um rótulo opcional) e uma Indisponibilidade que liga pessoa a culto (a existência do registro significa "não pode servir"; a ausência significa disponível). A tela central é: seleciono uma pessoa e vejo todos os cultos, cada um com um estado "pode / não pode" que alterno clicando — alternar cria ou remove o registro de indisponibilidade.
+Escopo do MVP: apenas registrar e consultar a disponibilidade de pessoas para cultos. Três entidades: Pessoa (só nome), Culto (data e um rótulo) e uma Indisponibilidade que liga pessoa a culto (a existência do registro significa "não pode servir"; a ausência significa disponível). A tela central é: seleciono uma pessoa e vejo todos os cultos, cada um com um estado "pode / não pode" que alterno clicando — alternar cria ou remove o registro de indisponibilidade.
 
 Fora do escopo (não implemente): ministérios, funções, qualificações, geração de escala, alocação, formulário público, tokens, limite de carga, preferências, exportação. Nada disso entra neste MVP.
 
