@@ -46,4 +46,31 @@ export class PessoaService {
             }
         })
     }
+
+    async findDisponibilidade(id: number) {
+        const cultos = this.prisma.culto.findMany({
+            include: {
+                indisponibilidades: {
+                    where: {pessoaId: id}
+                }
+            }      
+        })
+
+    }
 }
+
+/* A estrutura geral fica assim:
+
+const cultos = await this.prisma.culto.findMany({
+  include: { indisponibilidades: { where: { pessoaId: id } } }
+})
+
+return cultos.map((culto) => ({
+  // ...os campos do culto que você quer expor (id, nome, data)
+  disponivel: /* alguma expressão booleana usando culto.indisponibilidades 
+}))
+
+Dentro do callback, culto é um objeto com id, nome, data (os campos normais de Culto) e indisponibilidades (o array filtrado). Você monta o objeto de retorno escolhendo os campos que interessam e calculando disponivel a partir do tamanho desse array (lembra: vazio = disponível).
+
+Tenta preencher os campos e a expressão de disponivel você mesma — já te dei a peça que faltava (o formato do .map() em cima do resultado do include).
+*/
