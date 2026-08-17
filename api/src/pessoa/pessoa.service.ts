@@ -39,7 +39,7 @@ export class PessoaService {
         })
     }
 
-    async remove(id: number) {
+    async delete(id: number) {
         return this.prisma.pessoa.delete({
             where: {
                 id: id

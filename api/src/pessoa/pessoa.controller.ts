@@ -28,8 +28,8 @@ export class PessoaController {
     }
 
     @Delete(':id')
-    async remove(@Param('id', ParseIntPipe) id: number) {
-        return this.pessoaService.remove(id)
+    async delete(@Param('id', ParseIntPipe) id: number) {
+        return this.pessoaService.delete(id)
     }
     
 
