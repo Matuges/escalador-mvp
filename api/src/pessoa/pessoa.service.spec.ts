@@ -4,7 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 describe('PessoaService', () => {
   let service: PessoaService;
-  let prisma: { pessoa: { create: jest.Mock, findMany: jest.Mock, findUnique: jest.Mock, update: jest.Mock, delete: jest.Mock } };
+  let prisma: { pessoa: { create: jest.Mock, findMany: jest.Mock, findUnique: jest.Mock, update: jest.Mock, delete: jest.Mock }, culto: { findMany: jest.Mock } };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,6 +18,9 @@ describe('PessoaService', () => {
               findUnique: jest.fn(),
               update: jest.fn(),
               delete: jest.fn()
+            },
+            culto: {
+              findMany: jest.fn()
             }
           }
         }
@@ -44,7 +47,7 @@ describe('PessoaService', () => {
   })
 
   it('should find all pessoas', async () => {
-    const pessoas = [ {id: 1, nome: 'Maria'}, {id: 2, nome: 'João'}]
+    const pessoas = [{ id: 1, nome: 'Maria' }, { id: 2, nome: 'João' }]
 
     prisma.pessoa.findMany.mockResolvedValue(pessoas)
 
@@ -55,14 +58,14 @@ describe('PessoaService', () => {
   })
 
   it('should find one pessoa', async () => {
-    const pessoa = { id: 1, nome: 'Maria'}
+    const pessoa = { id: 1, nome: 'Maria' }
     const id = 1
 
     prisma.pessoa.findUnique.mockResolvedValue(pessoa)
 
     const resultado = await service.findUnique(id)
 
-    expect(prisma.pessoa.findUnique).toHaveBeenCalledWith({where: {id}})
+    expect(prisma.pessoa.findUnique).toHaveBeenCalledWith({ where: { id } })
     expect(resultado).toEqual(pessoa)
   })
 
@@ -70,23 +73,48 @@ describe('PessoaService', () => {
     const dto = { nome: 'João' }
     const id = 1
 
-    const pessoaEditada = { id: 1, nome: 'João'}
+    const pessoaEditada = { id: 1, nome: 'João' }
     prisma.pessoa.update.mockResolvedValue(pessoaEditada)
 
     const resultado = await service.update(id, dto)
 
-    expect(prisma.pessoa.update).toHaveBeenCalledWith({data: {nome: dto.nome}, where: {id} })
+    expect(prisma.pessoa.update).toHaveBeenCalledWith({ data: { nome: dto.nome }, where: { id } })
     expect(resultado).toEqual(pessoaEditada)
   })
 
   it('should remove one pessoa', async () => {
     const id = 1
-    const pessoa = {id: 1, nome: "Mateus"}
+    const pessoa = { id: 1, nome: "Mateus" }
     prisma.pessoa.delete.mockResolvedValue(pessoa)
 
     const resultado = await service.delete(id)
 
-    expect(prisma.pessoa.delete).toHaveBeenCalledWith({where: {id}})
+    expect(prisma.pessoa.delete).toHaveBeenCalledWith({ where: { id } })
     expect(resultado).toEqual(pessoa)
   })
-});
+
+  it('should find disponibilidades', async () => {
+    const id = 1
+
+    const cultos = [{ id: 1, nome: "Manha", data: "21/08/2026", indisponibilidades: [{ pessoaId: 1, cultoId: 1 }] }, { id: 2, nome: "Noite", data: "21/08/2026", indisponibilidades: [{ pessoaId: 2, cultoId: 2 }] }]
+
+    prisma.culto.findMany.mockResolvedValue(cultos)
+
+    const resultado = await service.findDisponibilidade(id)
+
+    expect(prisma.culto.findMany).toHaveBeenCalledWith({
+      include: {
+        indisponibilidades: {
+          where: { pessoaId: id }
+        }
+      }
+    })
+
+    expect(resultado).toEqual(cultos.map((culto) => ({
+      culto: culto.nome,
+      id: culto.id,
+      data: culto.data,
+      disponivel: culto.indisponibilidades.length === 0
+    })))
+  })
+})
