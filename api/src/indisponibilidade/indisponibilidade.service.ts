@@ -8,7 +8,7 @@ export class IndisponibilidadeService {
     async setIndisponibilidade (pessoaId: number, cultoId: number) {
         return this.prisma.indisponibilidade.upsert({
             create: {pessoaId: pessoaId, cultoId: cultoId},
-            update: {pessoaId: pessoaId, cultoId: cultoId},
+            update: {},
             where: { pessoaId_cultoId: {pessoaId: pessoaId, cultoId: cultoId }}
         })
     }
