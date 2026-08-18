@@ -11,7 +11,7 @@ export class CultoService {
         return this.prisma.culto.create({
             data: {
                 nome: dto.nome,
-                data: dto.data
+                data: new Date(dto.data)
             }
         })
     }
@@ -30,7 +30,7 @@ export class CultoService {
         return this.prisma.culto.update({
             data: {
                 nome: dto.nome,
-                data: dto.data
+                data: dto.data ? new Date(dto.data) : undefined
             },
             where: { id }
         })
