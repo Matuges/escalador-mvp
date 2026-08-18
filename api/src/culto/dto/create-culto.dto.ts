@@ -1,4 +1,4 @@
-import { IsDate, IsDateString, IsNotEmpty, IsString } from "class-validator";
+import { IsDateString, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateCultoDto {
         @IsString()
@@ -7,5 +7,5 @@ export class CreateCultoDto {
 
         @IsDateString()
         @IsNotEmpty()
-        data!: Date
+        data!: string
 }
