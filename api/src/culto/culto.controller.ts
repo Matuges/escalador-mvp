@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { CultoService } from './culto.service';
 import { CreateCultoDto } from './dto/create-culto.dto';
 import { UpdateCultoDto } from './dto/update-culto.dto';
@@ -17,6 +17,11 @@ export class CultoController {
         return this.cultoService.findAll()
     }
 
+     @Get('mes')
+   gerarCultosDoMes(@Query('ano', ParseIntPipe) ano: number, @Query('mes') mes: number) {
+    return this.cultoService.gerarCultosDoMes(ano, mes)
+   }
+
     @Get(':id')
     async findUnique(@Param('id', ParseIntPipe) id: number) {
         return this.cultoService.findUnique(id)
@@ -31,4 +36,6 @@ export class CultoController {
     async delete(@Param('id', ParseIntPipe) id: number) {
         return this.cultoService.delete(id)
     }
+
+
 }

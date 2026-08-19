@@ -8,5 +8,11 @@
   },
   "keywords": [],
   "type": "commonjs",
-  "workspaces": ["api"]
+  "workspaces": [
+    "api",
+    "front"
+  ],
+  "allowScripts": {
+    "esbuild@0.25.12": true
+  }
 }
