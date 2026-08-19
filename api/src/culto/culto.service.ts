@@ -81,6 +81,12 @@ export class CultoService {
         return cultos
     }
 
+    salvarCultosDoMes (ano: number, mes: number) {
+        const cultos = this.gerarCultosDoMes(ano, mes)
+        return this.prisma.culto.createMany({
+            data: cultos
+        })
+    }
 }
 
 
