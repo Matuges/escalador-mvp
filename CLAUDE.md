@@ -1,18 +1,14 @@
-'# CLAUDE.md
+# CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Repository structure
 
-Monorepo with npm workspaces, two real projects:
-- `api/` — NestJS + Prisma backend
-- `front/` — React + Vite + Tailwind SPA (shadcn/ui is planned in the Stack section below but **not installed yet**: no `components.json`, no `src/components/ui/`, no `src/lib/utils.ts`. All inputs are hand-styled raw `<input>`/`<select>` using Tailwind utility classes.)
+This repo currently contains a single project: `api/`, a NestJS backend (freshly scaffolded via `nest new`, not yet built out). Root-level `package.json` is an unrelated empty stub — all real work happens inside `api/`.
 
-Root-level `package.json` is workspace orchestration only, no real scripts.
+## Commands
 
-## Commands — api/
-
-Run from the `api/` directory.
+Run all commands from the `api/` directory.
 
 ```bash
 npm run start:dev      # dev server with watch mode
@@ -34,45 +30,16 @@ Run a single test by name: `npx jest -t "test name"`
 
 Node version is pinned via `.nvmrc` (v22.23.2).
 
-## Commands — front/
+## Architecture
 
-Run from the `front/` directory.
-
-```bash
-npm run dev        # vite dev server (proxies /api -> http://localhost:3000, see vite.config.ts)
-npm run build       # tsc -b && vite build
-npm run preview    # preview the production build
-```
-
-No test runner configured yet in `front/`.
-
-Type-check without emitting: `npx tsc --noEmit -p tsconfig.app.json`
-
-## Architecture — api/
-
-Standard NestJS module/controller/service structure, one module per entity:
+Standard NestJS module/controller/service structure:
 - `src/main.ts` — entrypoint, bootstraps the Nest app via `NestFactory`, listens on `process.env.PORT` (defaults to 3000)
 - `src/app.module.ts` — root module; register new feature modules here as the app grows
-- `src/pessoa/` — `pessoa.controller.ts` / `pessoa.service.ts` / `dto/{create,update}-pessoa.dto.ts`. Also owns `GET pessoa/:id/disponibilidades` — for a pessoa, returns every culto with a `disponivel` flag.
-- `src/culto/` — `culto.controller.ts` / `culto.service.ts` / `dto/{create,update,mes}-culto.dto.ts`. Also owns `gerarCultosDoMes`/`salvarCultosDoMes` (auto-generates the month's cultos from a fixed weekly pattern — Sunday AM/PM, Tuesday, 1st/3rd Saturday).
-- `src/indisponibilidade/` — `indisponibilidade.controller.ts` / `indisponibilidade.service.ts`, no DTOs (route params only). Routes are nested under `pessoa/:pessoaId/indisponibilidade/:cultoId` (`PUT` upserts = mark unavailable, `DELETE` = mark available again). Symmetric/idempotent, callable from either the "by pessoa" or "by culto" direction.
-- `src/prisma/` — `PrismaService`/`PrismaModule`, injected into the other services.
-- Each entity module follows the same `*.controller.ts` / `*.service.ts` / `dto/` layout; new entities should mirror this.
+- `src/*.controller.ts` / `src/*.service.ts` — controller/service pairs per Nest convention
 
 Environment variables live in `api/.env` (see `api/.env.example` for the expected shape); `api/.env` is not loaded automatically yet — no `@nestjs/config` setup is present in `app.module.ts`.
 
 Jest config for unit tests lives inline in `api/package.json` (`rootDir: src`, matches `*.spec.ts`). E2E tests use the separate config at `api/test/jest-e2e.json`.
-
-## Architecture — front/
-
-Flat structure, no subdirectories under `src/` yet, no router (tabs are plain `useState`), no global state library:
-- `src/api.ts` — every fetch call to the API plus the shared TS types (`Pessoa`, `Culto`, `DisponibilidadeItem`, `CultoDisponibilidadeItem`, `CultoPreview`). Each function is a standalone `fetch` against `BASE = '/api'` with its own `if (!res.ok) throw new Error(...)`, no shared request helper. Add new API calls here following that same pattern.
-- `src/App.tsx` — root; `useState<Tab>` where `Tab = 'disponibilidade' | 'pessoas' | 'cultos'` switches between the three pages below. No URL routing.
-- `src/DisponibilidadePage.tsx` — the MVP's central screen: pick a Pessoa, see every Culto with a "Pode/Não pode" toggle pill (toggling calls the indisponibilidade PUT/DELETE endpoints).
-- `src/CultosPage.tsx` — Culto CRUD (create/edit/delete), the "gerar cultos do mês" preview/save panel, and a search bar filtering the list by substring on `nome`. Clicking a culto's name swaps the whole page to `CultoDisponibilidadesPage` (local `cultoSelecionado` state, not a new tab).
-- `src/CultoDisponibilidadesPage.tsx` — inverse of `DisponibilidadePage`: given one culto, lists every pessoa with the same toggle pill, keyed by `pessoaId` instead of `cultoId`. Depends on `GET culto/:id/disponibilidades`, which does **not exist in the backend yet** (mirrors `PessoaService.findDisponibilidade` but inverted — see that method for the pattern to copy when implementing it).
-- `src/PessoasPage.tsx` — Pessoa CRUD.
-- `src/index.css` — Tailwind v4 theme tokens (`@theme` block): `navy`, `steel`, `mist`, `sand`, `caramel`, `espresso`, `ivory`. No dedicated danger/red color — the existing "unavailable" state reuses `sand`/`caramel`/`espresso` (warm/muted tones), not red.
 
 # Projeto: sistema de escalas de serviço de igreja — MVP inicial
 
@@ -92,10 +59,9 @@ Node 22 (já instalado e em uso)
 ## Estrutura — monorepo com npm workspaces:
 
 raiz/                 (git, .nvmrc, .gitignore, package.json de orquestração com workspaces)
-├── api/              (NestJS; package.json próprio; prisma/schema.prisma; .env e .env.example)
-└── front/            (React + Vite + Tailwind; package.json próprio — ver "Architecture — front/" acima para o mapa de arquivos)
+└── api/              (NestJS; package.json próprio; prisma/schema.prisma; .env e .env.example)
 
-/solver (Python) e /caddy são fases futuras — não crie ainda.
+O front virá em /front depois. /solver (Python) e /caddy são fases futuras — não crie ainda.
 
 ## Convenções e decisões já tomadas:
 
