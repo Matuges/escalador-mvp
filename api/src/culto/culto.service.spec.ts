@@ -4,7 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 describe('CultoService', () => {
   let service: CultoService;
-  let prisma: { culto: { create: jest.Mock, findMany: jest.Mock, findUnique: jest.Mock, update: jest.Mock, delete: jest.Mock } };
+  let prisma: { culto: { create: jest.Mock, findMany: jest.Mock, findUnique: jest.Mock, update: jest.Mock, delete: jest.Mock, createMany: jest.Mock }, pessoa: { findMany: jest.Mock } };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,7 +17,11 @@ describe('CultoService', () => {
               findMany: jest.fn(),
               findUnique: jest.fn(),
               update: jest.fn(),
-              delete: jest.fn()
+              delete: jest.fn(),
+              createMany: jest.fn()
+            },
+            pessoa: {
+              findMany: jest.fn()
             }
           }
         }
@@ -33,7 +37,7 @@ describe('CultoService', () => {
   });
 
   it('should create a new culto', async () => {
-    const dto = { nome: 'Culto da Manhã', data: new Date('2026-08-21') };
+    const dto = { nome: 'Culto da Manhã', data: '2026-08-21' };
     const cultoCriado = { id: 1, nome: 'Culto da Manhã', data: new Date('2026-08-21') };
     prisma.culto.create.mockResolvedValue(cultoCriado);
 
@@ -69,7 +73,7 @@ describe('CultoService', () => {
 
   it('should update one culto', async () => {
     const id = 1;
-    const dto = { nome: 'Culto da Tarde', data: new Date('2026-08-22') };
+    const dto = { nome: 'Culto da Tarde', data: '2026-08-22' };
     const cultoEditado = { id: 1, nome: 'Culto da Tarde', data: new Date('2026-08-22') };
     prisma.culto.update.mockResolvedValue(cultoEditado);
 
@@ -88,5 +92,53 @@ describe('CultoService', () => {
 
     expect(prisma.culto.delete).toHaveBeenCalledWith({ where: { id } });
     expect(resultado).toEqual(culto);
+  });
+
+  it('should generate the cultos for a given month', () => {
+    const resultado = service.gerarCultosDoMes(2026, 8);
+
+    expect(resultado).toHaveLength(16);
+    expect(resultado.filter((c) => c.nome === 'Culto de domingo a manhã')).toHaveLength(5);
+    expect(resultado.filter((c) => c.nome === 'Culto de domingo de noite')).toHaveLength(5);
+    expect(resultado.filter((c) => c.nome === 'Culto de terça')).toHaveLength(4);
+    expect(resultado.filter((c) => c.nome === 'Culto de consagração')).toHaveLength(2);
+    expect(resultado).toContainEqual({ nome: 'Culto de consagração', data: new Date(2026, 7, 1) });
+    expect(resultado).toContainEqual({ nome: 'Culto de consagração', data: new Date(2026, 7, 15) });
+    expect(resultado).not.toContainEqual(expect.objectContaining({ nome: 'Culto de consagração', data: new Date(2026, 7, 8) }));
+  });
+
+  it('should save the cultos generated for the month', () => {
+    const cultosGerados = service.gerarCultosDoMes(2026, 8);
+    prisma.culto.createMany.mockResolvedValue({ count: cultosGerados.length });
+
+    const resultado = service.salvarCultosDoMes(2026, 8);
+
+    expect(prisma.culto.createMany).toHaveBeenCalledWith({ data: cultosGerados });
+    return expect(resultado).resolves.toEqual({ count: cultosGerados.length });
+  });
+
+  it('should find disponibilidades for a culto', async () => {
+    const id = 1;
+    const pessoas = [
+      { id: 1, nome: 'Maria', indisponibilidades: [] },
+      { id: 2, nome: 'João', indisponibilidades: [{ pessoaId: 2, cultoId: 1 }] }
+    ];
+    prisma.pessoa.findMany.mockResolvedValue(pessoas);
+
+    const resultado = await service.findDisponibilidade(id);
+
+    expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
+      include: {
+        indisponibilidades: {
+          where: { cultoId: id }
+        }
+      }
+    });
+
+    expect(resultado).toEqual(pessoas.map((pessoa) => ({
+      pessoa: pessoa.nome,
+      id: pessoa.id,
+      disponivel: pessoa.indisponibilidades.length === 0
+    })));
   });
 });
