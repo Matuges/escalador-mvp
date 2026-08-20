@@ -43,5 +43,8 @@ export class CultoController {
         return this.cultoService.delete(id)
     }
 
-
+    @Get(':id/disponibilidades')
+    async findDisponibilidade(@Param('id', ParseIntPipe) id: number) {
+        return this.cultoService.findDisponibilidade(id)
+    } 
 }

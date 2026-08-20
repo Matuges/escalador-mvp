@@ -87,6 +87,22 @@ export class CultoService {
             data: cultos
         })
     }
+
+    async findDisponibilidade(id: number) {
+        const pessoas = await this.prisma.pessoa.findMany({
+            include: {
+                indisponibilidades: {
+                    where: {cultoId: id}
+                }
+            }      
+        })
+
+        return (pessoas).map((pessoa) => ({
+            pessoa: pessoa.nome,
+            id: pessoa.id,
+            disponivel: pessoa.indisponibilidades.length === 0 
+        }))
+    }
 }
 
 
