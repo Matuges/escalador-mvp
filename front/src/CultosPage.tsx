@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react'
-import { listCultos, createCulto, updateCulto, deleteCulto, type Culto } from './api'
+import {
+  listCultos,
+  createCulto,
+  updateCulto,
+  deleteCulto,
+  gerarCultosDoMes,
+  salvarCultosDoMes,
+  type Culto,
+  type CultoPreview,
+} from './api'
 
 function fmtData(iso: string) {
   return new Date(iso).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
@@ -17,6 +26,12 @@ export default function CultosPage() {
   const [editNome, setEditNome] = useState('')
   const [editData, setEditData] = useState('')
   const [error, setError] = useState<string | null>(null)
+
+  const hoje = new Date()
+  const [mesAno, setMesAno] = useState(hoje.getFullYear())
+  const [mesMes, setMesMes] = useState(hoje.getMonth() + 1)
+  const [preview, setPreview] = useState<CultoPreview[] | null>(null)
+  const [salvandoMes, setSalvandoMes] = useState(false)
 
   useEffect(() => {
     listCultos()
@@ -63,6 +78,30 @@ export default function CultosPage() {
     }
   }
 
+  async function handleGerarPreview() {
+    setError(null)
+    try {
+      const gerados = await gerarCultosDoMes(mesAno, mesMes)
+      setPreview(gerados)
+    } catch {
+      setError('Erro ao gerar cultos do mês.')
+    }
+  }
+
+  async function handleSalvarMes() {
+    setSalvandoMes(true)
+    setError(null)
+    try {
+      await salvarCultosDoMes(mesAno, mesMes)
+      setPreview(null)
+      setCultos(await listCultos())
+    } catch {
+      setError('Erro ao salvar cultos do mês.')
+    } finally {
+      setSalvandoMes(false)
+    }
+  }
+
   return (
     <div>
       <h2 className="text-lg font-semibold text-navy mb-4">Cultos</h2>
@@ -94,6 +133,56 @@ export default function CultosPage() {
           Adicionar
         </button>
       </form>
+
+      <div className="mb-6 bg-white border border-mist rounded-md px-4 py-3">
+        <h3 className="text-sm font-semibold text-navy mb-2">Gerar cultos do mês</h3>
+        <div className="flex items-center gap-2 mb-3">
+          <input
+            type="number"
+            value={mesMes}
+            min={1}
+            max={12}
+            onChange={(e) => setMesMes(Number(e.target.value))}
+            className="w-20 border border-mist rounded-md px-3 py-2 text-sm text-espresso focus:outline-none focus:ring-2 focus:ring-steel"
+          />
+          <input
+            type="number"
+            value={mesAno}
+            onChange={(e) => setMesAno(Number(e.target.value))}
+            className="w-24 border border-mist rounded-md px-3 py-2 text-sm text-espresso focus:outline-none focus:ring-2 focus:ring-steel"
+          />
+          <button
+            onClick={handleGerarPreview}
+            className="px-3 py-2 bg-steel text-white text-sm rounded-md hover:bg-navy transition-colors"
+          >
+            Prévia
+          </button>
+          {preview && (
+            <button
+              disabled={salvandoMes}
+              onClick={handleSalvarMes}
+              className="px-3 py-2 bg-navy text-white text-sm rounded-md hover:bg-steel transition-colors disabled:opacity-50"
+            >
+              {salvandoMes ? 'Salvando...' : 'Salvar'}
+            </button>
+          )}
+        </div>
+
+        {preview && (
+          <div className="space-y-1">
+            {preview.length === 0 ? (
+              <p className="text-sm text-caramel">Nenhum culto gerado para esse mês.</p>
+            ) : (
+              preview.map((p, i) => (
+                <div key={i} className="flex justify-between text-sm text-espresso">
+                  <span>{p.nome}</span>
+                  <span className="text-caramel">{fmtData(p.data)}</span>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
 
       <div className="space-y-2">
         {cultos.length === 0 && (

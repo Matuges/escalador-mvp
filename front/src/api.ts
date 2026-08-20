@@ -3,6 +3,7 @@ const BASE = '/api'
 export type Pessoa = { id: number; nome: string }
 export type Culto = { id: number; nome: string; data: string }
 export type DisponibilidadeItem = { id: number; culto: string; data: string; disponivel: boolean }
+export type CultoPreview = { nome: string; data: string }
 
 // --- Pessoas ---
 
@@ -68,6 +69,22 @@ export async function updateCulto(id: number, nome: string, data: string): Promi
 export async function deleteCulto(id: number): Promise<void> {
   const res = await fetch(`${BASE}/culto/${id}`, { method: 'DELETE' })
   if (!res.ok) throw new Error('Erro ao deletar culto')
+}
+
+export async function gerarCultosDoMes(ano: number, mes: number): Promise<CultoPreview[]> {
+  const res = await fetch(`${BASE}/culto/mes?ano=${ano}&mes=${mes}`)
+  if (!res.ok) throw new Error('Erro ao gerar cultos do mês')
+  return res.json()
+}
+
+export async function salvarCultosDoMes(ano: number, mes: number): Promise<{ count: number }> {
+  const res = await fetch(`${BASE}/culto/mes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ano, mes }),
+  })
+  if (!res.ok) throw new Error('Erro ao salvar cultos do mês')
+  return res.json()
 }
 
 // --- Disponibilidade ---
