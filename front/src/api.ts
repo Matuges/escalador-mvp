@@ -3,6 +3,7 @@ const BASE = '/api'
 export type Pessoa = { id: number; nome: string }
 export type Culto = { id: number; nome: string; data: string }
 export type DisponibilidadeItem = { id: number; culto: string; data: string; disponivel: boolean }
+export type CultoDisponibilidadeItem = { id: number; pessoa: string; disponivel: boolean }
 export type CultoPreview = { nome: string; data: string }
 
 // --- Pessoas ---
@@ -103,4 +104,10 @@ export async function setIndisponivel(pessoaId: number, cultoId: number): Promis
 export async function removeIndisponivel(pessoaId: number, cultoId: number): Promise<void> {
   const res = await fetch(`${BASE}/pessoa/${pessoaId}/indisponibilidade/${cultoId}`, { method: 'DELETE' })
   if (!res.ok) throw new Error('Erro ao remover indisponibilidade')
+}
+
+export async function findDisponibilidadesPorCulto(cultoId: number): Promise<CultoDisponibilidadeItem[]> {
+  const res = await fetch(`${BASE}/culto/${cultoId}/disponibilidades`)
+  if (!res.ok) throw new Error('Erro ao buscar disponibilidades')
+  return res.json()
 }

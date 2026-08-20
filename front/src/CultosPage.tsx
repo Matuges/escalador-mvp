@@ -9,6 +9,7 @@ import {
   type Culto,
   type CultoPreview,
 } from './api'
+import CultoDisponibilidadesPage from './CultoDisponibilidadesPage'
 
 function fmtData(iso: string) {
   return new Date(iso).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
@@ -26,6 +27,8 @@ export default function CultosPage() {
   const [editNome, setEditNome] = useState('')
   const [editData, setEditData] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [busca, setBusca] = useState('')
+  const [cultoSelecionado, setCultoSelecionado] = useState<Culto | null>(null)
 
   const hoje = new Date()
   const [mesAno, setMesAno] = useState(hoje.getFullYear())
@@ -88,6 +91,10 @@ export default function CultosPage() {
     }
   }
 
+  const cultosFiltrados = cultos.filter((c) =>
+    c.nome.toLowerCase().includes(busca.trim().toLowerCase()),
+  )
+
   async function handleSalvarMes() {
     setSalvandoMes(true)
     setError(null)
@@ -100,6 +107,15 @@ export default function CultosPage() {
     } finally {
       setSalvandoMes(false)
     }
+  }
+
+  if (cultoSelecionado) {
+    return (
+      <CultoDisponibilidadesPage
+        culto={cultoSelecionado}
+        onVoltar={() => setCultoSelecionado(null)}
+      />
+    )
   }
 
   return (
@@ -184,11 +200,22 @@ export default function CultosPage() {
         )}
       </div>
 
+      <input
+        type="text"
+        placeholder="Buscar culto..."
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+        className="w-full border border-mist rounded-md px-3 py-2 text-sm text-espresso placeholder:text-caramel focus:outline-none focus:ring-2 focus:ring-steel mb-4"
+      />
+
       <div className="space-y-2">
         {cultos.length === 0 && (
           <p className="text-sm text-caramel">Nenhum culto cadastrado.</p>
         )}
-        {cultos.map((c) => (
+        {cultos.length > 0 && cultosFiltrados.length === 0 && (
+          <p className="text-sm text-caramel">Nenhum culto encontrado para essa busca.</p>
+        )}
+        {cultosFiltrados.map((c) => (
           <div
             key={c.id}
             className="flex items-center gap-2 bg-white border border-mist rounded-md px-4 py-2"
@@ -223,7 +250,12 @@ export default function CultosPage() {
               </>
             ) : (
               <>
-                <span className="flex-1 text-espresso">{c.nome}</span>
+                <span
+                  onClick={() => setCultoSelecionado(c)}
+                  className="flex-1 text-espresso cursor-pointer hover:underline"
+                >
+                  {c.nome}
+                </span>
                 <span className="text-sm text-caramel">{fmtData(c.data)}</span>
                 <button
                   onClick={() => startEdit(c)}
