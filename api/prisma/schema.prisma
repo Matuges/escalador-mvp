@@ -16,6 +16,8 @@ datasource db {
 model Pessoa {
   id Int @id @default(autoincrement())
   nome String
+
+  qualificacoes Qualificacao[]
   indisponibilidades Indisponibilidade[]
 
   @@map("pessoa")
@@ -39,4 +41,34 @@ model Indisponibilidade {
 
   @@map("indisponibilidade")
   @@id([pessoaId, cultoId])
+}
+
+model Funcao {
+  id Int @id @default(autoincrement())
+  nome String
+  ministerio Ministerio @relation(fields: [ministerioId], references: [id])
+  ministerioId Int
+
+  qualificacoes Qualificacao[]
+
+  @@map("funcao")
+}
+
+model Ministerio {
+  id Int @id @default(autoincrement())
+  nome String
+  funcoes Funcao[]
+
+  @@map("ministerio")
+}
+
+model Qualificacao {
+  pessoa Pessoa @relation(fields: [pessoaId], references: [id])
+  funcao Funcao @relation(fields: [funcaoId], references: [id])
+
+  funcaoId Int 
+  pessoaId Int
+
+  @@map("qualificacao")
+  @@id([pessoaId, funcaoId])
 }
