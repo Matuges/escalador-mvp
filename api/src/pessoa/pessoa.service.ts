@@ -78,7 +78,8 @@ export class PessoaService {
             funcao: funcao.nome,
             id: funcao.id,
             qualificado: funcao.qualificacoes.length > 0,
-            ministerio: funcao.ministerio.nome
+            ministerio: funcao.ministerio.nome,
+            ministerioId: funcao.ministerio.id
         }))
     }
 }
