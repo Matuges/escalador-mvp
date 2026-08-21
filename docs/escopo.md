@@ -1,0 +1,4 @@
+# VISÃO GERAL
+O objetivo é desenvolver uma aplicação web que centralize diversos módulos de automação para a utilização dos membros da ICNV anil. Esse é o módulo Escalador, um projeto para automatizar a criação de escalas, coletando a disponibilidade dos voluntários, alocando pessoas por ministério e função respeitando restrições customizáveis, e exportando o resultado como imagem ou planilha. 
+
+O sistema atende a dois perfis. O líder/administrador opera pelo painel administrativo, com acesso por login, e é responsável pelos cadastros (pessoas, ministérios, funções, tipos de culto), pela configuração das regras, pela geração e revisão das escalas e pela exportação. O voluntário não faz login: recebe um link individual por token e o usa apenas para informar sua disponibilidade no formulário do mês. 

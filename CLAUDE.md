@@ -41,13 +41,35 @@ Environment variables live in `api/.env` (see `api/.env.example` for the expecte
 
 Jest config for unit tests lives inline in `api/package.json` (`rootDir: src`, matches `*.spec.ts`). E2E tests use the separate config at `api/test/jest-e2e.json`.
 
-# Projeto: sistema de escalas de serviço de igreja — MVP inicial
+# Projeto: sistema de escalas de serviço de igreja (módulo Escalador)
 
-Estou construindo, como desenvolvedor solo, um sistema web que futuramente vai gerar escalas de serviço de uma igreja automaticamente. Este é o primeiro MVP, deliberadamente mínimo. Não implemente nada além do escopo abaixo.
+Estou construindo, como desenvolvedor solo, um módulo (Escalador) de um sistema maior de automações da igreja. Visão completa do produto em `docs/escopo.md`; lista completa de requisitos funcionais (RF01-RF31) em `docs/rfs.md`. Esses dois documentos descrevem o sistema **final**, não o que deve ser implementado agora — o desenvolvimento segue em sprints incrementais (veja abaixo), então boa parte do que está lá é propositalmente ainda fora do que estamos construindo.
 
-Escopo do MVP: apenas registrar e consultar a disponibilidade de pessoas para cultos. Três entidades: Pessoa (só nome), Culto (data e um rótulo) e uma Indisponibilidade que liga pessoa a culto (a existência do registro significa "não pode servir"; a ausência significa disponível). A tela central é: seleciono uma pessoa e vejo todos os cultos, cada um com um estado "pode / não pode" que alterno clicando — alternar cria ou remove o registro de indisponibilidade.
+## MVP inicial (concluído)
 
-Fora do escopo (não implemente): ministérios, funções, qualificações, geração de escala, alocação, formulário público, tokens, limite de carga, preferências, exportação. Nada disso entra neste MVP.
+O primeiro MVP cobria só disponibilidade: Pessoa (nome), Culto (data e rótulo) e Indisponibilidade (pessoa↔culto; existência do registro = "não pode servir"). Essas entidades continuam a base do sistema.
+
+Também foi construído, fora do escopo original do MVP mas necessário e para manter: um **gerador de cultos recorrentes por mês** (`CultoService.gerarCultosDoMes`/`salvarCultosDoMes`) — deriva automaticamente os cultos de domingo, terça e os sábados de consagração (1º e 3º) de um mês/ano. É uma peça permanente, não descartar.
+
+## Fase atual — desenvolvimento por sprints
+
+Estamos indo de "registrar disponibilidade" para o sistema de escalas de verdade, em sprints pequenos com protótipo demonstrável ao final de cada um. A lógica: primeiro construir camadas de qualidade de vida (exibição filtrada, montagem manual de escala) sobre um schema mais completo; só depois — se/quando fizer sentido — um gerador automático passa a consumir esses mesmos dados.
+
+**Sprint 1 (atual):**
+- Schema: adicionar `Ministério`, `Função` e `Qualificação` (pessoa ↔ função que pode exercer).
+- Exibição filtrada: pessoas disponíveis para um culto, filtradas por ministério e função específicos.
+
+**Sprint 2:**
+- Schema: `Alocação` (pessoa + culto + função) — é o registro por trás do montador manual de escala.
+- RF17 (demanda de cada função por tipo de culto), para mostrar quota no montador (ex: "faltam 2 vocalistas").
+
+**Sprint 3:**
+- Schema: `Ciclo` (agrupa cultos num período) + histórico de escalas entre ciclos (RF27/28).
+
+**Sprint 4 (mais à frente — é quando um gerador automático passaria a fazer sentido):**
+- RF14 (teto de escalas por pessoa) e RF15/16 (pares que devem/devem evitar servir juntos). Não modelar antes disso: sem gerador consumindo essas regras, são campos sem uso.
+
+**Fora do horizonte por enquanto** (não implementar sem decisão explícita): formulário público por token (RF05-13), geração automática de escala + escalas candidatas (RF20-26), exportação como imagem/planilha (RF29-31).
 
 ## Stack:
 
