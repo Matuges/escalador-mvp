@@ -4,7 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 describe('PessoaService', () => {
   let service: PessoaService;
-  let prisma: { pessoa: { create: jest.Mock, findMany: jest.Mock, findUnique: jest.Mock, update: jest.Mock, delete: jest.Mock }, culto: { findMany: jest.Mock } };
+  let prisma: { pessoa: { create: jest.Mock, findMany: jest.Mock, findUnique: jest.Mock, update: jest.Mock, delete: jest.Mock }, culto: { findMany: jest.Mock }, funcao: { findMany: jest.Mock } };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,6 +20,9 @@ describe('PessoaService', () => {
               delete: jest.fn()
             },
             culto: {
+              findMany: jest.fn()
+            },
+            funcao: {
               findMany: jest.fn()
             }
           }
@@ -115,6 +118,36 @@ describe('PessoaService', () => {
       id: culto.id,
       data: culto.data,
       disponivel: culto.indisponibilidades.length === 0
+    })))
+  })
+
+  it('should find qualificacoes', async () => {
+    const id = 1
+
+    const funcoes = [
+      { id: 1, nome: "Vocal", ministerio: { id: 1, nome: "Louvor" }, qualificacoes: [{ pessoaId: 1, funcaoId: 1 }] },
+      { id: 2, nome: "Som", ministerio: { id: 2, nome: "Tecnica" }, qualificacoes: [] }
+    ]
+
+    prisma.funcao.findMany.mockResolvedValue(funcoes)
+
+    const resultado = await service.findQualificacao(id)
+
+    expect(prisma.funcao.findMany).toHaveBeenCalledWith({
+      include: {
+        qualificacoes: {
+          where: { pessoaId: id }
+        },
+        ministerio: true
+      }
+    })
+
+    expect(resultado).toEqual(funcoes.map((funcao) => ({
+      funcao: funcao.nome,
+      id: funcao.id,
+      qualificado: funcao.qualificacoes.length > 0,
+      ministerio: funcao.ministerio.nome,
+      ministerioId: funcao.ministerio.id
     })))
   })
 })
