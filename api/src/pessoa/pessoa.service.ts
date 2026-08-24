@@ -63,5 +63,24 @@ export class PessoaService {
             disponivel: culto.indisponibilidades.length === 0 
         }))
     }
+
+     async findQualificacao(id: number) {
+        const funcoes = await this.prisma.funcao.findMany({
+            include: {
+                qualificacoes: {
+                    where: {pessoaId: id}
+                },
+                ministerio: true
+            }      
+        })
+
+        return (funcoes).map((funcao) => ({
+            funcao: funcao.nome,
+            id: funcao.id,
+            qualificado: funcao.qualificacoes.length > 0,
+            ministerio: funcao.ministerio.nome,
+            ministerioId: funcao.ministerio.id
+        }))
+    }
 }
 
