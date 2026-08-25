@@ -5,11 +5,14 @@ export type Culto = { id: number; nome: string; data: string }
 export type DisponibilidadeItem = { id: number; culto: string; data: string; disponivel: boolean }
 export type CultoDisponibilidadeItem = { id: number; pessoa: string; disponivel: boolean }
 export type CultoPreview = { nome: string; data: string }
+export type Ministerio = { id: number; nome: string }
+export type Funcao = { id: number; nome: string; ministerioId: number }
 
 // --- Pessoas ---
 
-export async function listPessoas(): Promise<Pessoa[]> {
-  const res = await fetch(`${BASE}/pessoa`)
+export async function listPessoas(funcaoId?: number): Promise<Pessoa[]> {
+  const url = funcaoId != null ? `${BASE}/pessoa?funcaoId=${funcaoId}` : `${BASE}/pessoa`
+  const res = await fetch(url)
   if (!res.ok) throw new Error('Erro ao buscar pessoas')
   return res.json()
 }
@@ -106,8 +109,25 @@ export async function removeIndisponivel(pessoaId: number, cultoId: number): Pro
   if (!res.ok) throw new Error('Erro ao remover indisponibilidade')
 }
 
-export async function findDisponibilidadesPorCulto(cultoId: number): Promise<CultoDisponibilidadeItem[]> {
-  const res = await fetch(`${BASE}/culto/${cultoId}/disponibilidades`)
+export async function findDisponibilidadesPorCulto(cultoId: number, funcaoId?: number): Promise<CultoDisponibilidadeItem[]> {
+  const url = funcaoId != null
+    ? `${BASE}/culto/${cultoId}/disponibilidades?funcaoId=${funcaoId}`
+    : `${BASE}/culto/${cultoId}/disponibilidades`
+  const res = await fetch(url)
   if (!res.ok) throw new Error('Erro ao buscar disponibilidades')
+  return res.json()
+}
+
+// --- Ministerio/Funcao ---
+
+export async function listMinisterios(): Promise<Ministerio[]> {
+  const res = await fetch(`${BASE}/ministerio`)
+  if (!res.ok) throw new Error('Erro ao buscar ministérios')
+  return res.json()
+}
+
+export async function listFuncoesPorMinisterio(ministerioId: number): Promise<Funcao[]> {
+  const res = await fetch(`${BASE}/ministerio/${ministerioId}/funcao`)
+  if (!res.ok) throw new Error('Erro ao buscar funções')
   return res.json()
 }

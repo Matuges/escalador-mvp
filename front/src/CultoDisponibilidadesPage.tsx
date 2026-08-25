@@ -6,6 +6,7 @@ import {
   type Culto,
   type CultoDisponibilidadeItem,
 } from './api'
+import { useLouvorFuncoes } from './useLouvorFuncoes'
 
 type Props = {
   culto: Culto
@@ -19,13 +20,15 @@ export default function CultoDisponibilidadesPage({ culto, onVoltar }: Props) {
   const [loadingPessoa, setLoadingPessoa] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [filtro, setFiltro] = useState<Filtro>('todos')
+  const { funcoes, error: funcoesError } = useLouvorFuncoes()
+  const [funcaoId, setFuncaoId] = useState<number | null>(null)
 
   useEffect(() => {
     setError(null)
-    findDisponibilidadesPorCulto(culto.id)
+    findDisponibilidadesPorCulto(culto.id, funcaoId ?? undefined)
       .then(setPessoas)
       .catch(() => setError('Não foi possível carregar as pessoas.'))
-  }, [culto.id])
+  }, [culto.id, funcaoId])
 
   const pessoasExibidas = useMemo(() => {
     return pessoas
@@ -69,11 +72,25 @@ export default function CultoDisponibilidadesPage({ culto, onVoltar }: Props) {
         {new Date(culto.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
       </p>
 
-      {error && (
+      {(error ?? funcoesError) && (
         <div className="mb-4 rounded-md bg-sand/20 border border-caramel px-4 py-3 text-sm text-espresso">
-          {error}
+          {error ?? funcoesError}
         </div>
       )}
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-navy mb-1">Função</label>
+        <select
+          className="w-full border border-mist rounded-md px-3 py-2 bg-white text-espresso focus:outline-none focus:ring-2 focus:ring-steel"
+          value={funcaoId ?? ''}
+          onChange={(e) => setFuncaoId(e.target.value ? Number(e.target.value) : null)}
+        >
+          <option value="">Todas</option>
+          {funcoes.map((f) => (
+            <option key={f.id} value={f.id}>{f.nome}</option>
+          ))}
+        </select>
+      </div>
 
       <div className="mb-4">
         <label className="block text-sm font-medium text-navy mb-1">Filtrar</label>
