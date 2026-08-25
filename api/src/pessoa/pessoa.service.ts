@@ -16,8 +16,12 @@ export class PessoaService {
         )
     }
 
-    async findAll() {
-        return this.prisma.pessoa.findMany()
+    async findAll(funcaoId?: number) {
+        return this.prisma.pessoa.findMany({
+            where: funcaoId !== undefined
+                ? { qualificacoes: { some: { funcaoId } } }
+                : undefined
+        })
     }
 
     async findUnique(id: number) {

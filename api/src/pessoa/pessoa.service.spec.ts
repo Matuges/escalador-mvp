@@ -60,6 +60,20 @@ describe('PessoaService', () => {
     expect(resultado).toEqual(pessoas)
   })
 
+  it('should find pessoas qualified for a funcao', async () => {
+    const funcaoId = 1
+    const pessoas = [{ id: 1, nome: 'Maria' }]
+
+    prisma.pessoa.findMany.mockResolvedValue(pessoas)
+
+    const resultado = await service.findAll(funcaoId)
+
+    expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
+      where: { qualificacoes: { some: { funcaoId } } }
+    })
+    expect(resultado).toEqual(pessoas)
+  })
+
   it('should find one pessoa', async () => {
     const pessoa = { id: 1, nome: 'Maria' }
     const id = 1

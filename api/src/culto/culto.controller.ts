@@ -44,7 +44,10 @@ export class CultoController {
     }
 
     @Get(':id/disponibilidades')
-    async findDisponibilidade(@Param('id', ParseIntPipe) id: number) {
-        return this.cultoService.findDisponibilidade(id)
-    } 
+    async findDisponibilidade(
+        @Param('id', ParseIntPipe) id: number,
+        @Query('funcaoId', new ParseIntPipe({ optional: true })) funcaoId?: number,
+    ) {
+        return this.cultoService.findDisponibilidade(id, funcaoId)
+    }
 }
