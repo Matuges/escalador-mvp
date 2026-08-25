@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { MinisterioService } from './ministerio.service';
 import { CreateMinisterioDto } from './dto/create-ministerio.dto';
 import { UpdateMinisterioDto } from './dto/update-ministerio.dto';
@@ -8,8 +8,8 @@ export class MinisterioController {
   constructor(private readonly ministerioService: MinisterioService) {}
 
   @Post()
-  create(@Body() createMinisterioDto: CreateMinisterioDto) {
-    return this.ministerioService.create(createMinisterioDto);
+  create(@Body() dto: CreateMinisterioDto) {
+    return this.ministerioService.create(dto);
   }
 
   @Get()
@@ -18,17 +18,17 @@ export class MinisterioController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ministerioService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.ministerioService.findUnique(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMinisterioDto: UpdateMinisterioDto) {
-    return this.ministerioService.update(+id, updateMinisterioDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateMinisterioDto) {
+    return this.ministerioService.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ministerioService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.ministerioService.delete(id);
   }
 }

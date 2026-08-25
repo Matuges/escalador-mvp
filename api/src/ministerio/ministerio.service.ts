@@ -25,7 +25,7 @@ export class MinisterioService {
         })
     }
 
-async update(id: number, dto: CreateMinisterioDto) {
+async update(id: number, dto: UpdateMinisterioDto) {
         return this.prisma.ministerio.update({
             data: {
                 nome: dto.nome,
@@ -40,4 +40,4 @@ async update(id: number, dto: CreateMinisterioDto) {
         })
       }
     }
-    
+
