@@ -141,4 +141,30 @@ describe('CultoService', () => {
       disponivel: pessoa.indisponibilidades.length === 0
     })));
   });
+
+  it('should find disponibilidades for a culto filtered by funcao', async () => {
+    const id = 1;
+    const funcaoId = 2;
+    const pessoas = [
+      { id: 1, nome: 'Maria', indisponibilidades: [] }
+    ];
+    prisma.pessoa.findMany.mockResolvedValue(pessoas);
+
+    const resultado = await service.findDisponibilidade(id, funcaoId);
+
+    expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
+      where: { qualificacoes: { some: { funcaoId } } },
+      include: {
+        indisponibilidades: {
+          where: { cultoId: id }
+        }
+      }
+    });
+
+    expect(resultado).toEqual(pessoas.map((pessoa) => ({
+      pessoa: pessoa.nome,
+      id: pessoa.id,
+      disponivel: pessoa.indisponibilidades.length === 0
+    })));
+  });
 });

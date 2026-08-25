@@ -88,19 +88,22 @@ export class CultoService {
         })
     }
 
-    async findDisponibilidade(id: number) {
+    async findDisponibilidade(id: number, funcaoId?: number) {
         const pessoas = await this.prisma.pessoa.findMany({
+            where: funcaoId !== undefined
+                ? { qualificacoes: { some: { funcaoId } } }
+                : undefined,
             include: {
                 indisponibilidades: {
                     where: {cultoId: id}
                 }
-            }      
+            }
         })
 
         return (pessoas).map((pessoa) => ({
             pessoa: pessoa.nome,
             id: pessoa.id,
-            disponivel: pessoa.indisponibilidades.length === 0 
+            disponivel: pessoa.indisponibilidades.length === 0
         }))
     }
 }

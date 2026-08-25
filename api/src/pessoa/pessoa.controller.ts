@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { PessoaService } from './pessoa.service';
 import { CreatePessoaDto } from './dto/create-pessoa.dto';
 import { UpdatePessoaDto } from './dto/update-pessoa.dto';
@@ -13,8 +13,8 @@ export class PessoaController {
     }
 
     @Get()
-    async findAll() {
-            return this.pessoaService.findAll()
+    async findAll(@Query('funcaoId', new ParseIntPipe({ optional: true })) funcaoId?: number) {
+            return this.pessoaService.findAll(funcaoId)
     }
 
     @Get(':id') 
