@@ -6,9 +6,10 @@ import { PessoaModule } from './pessoa/pessoa.module';
 import { IndisponibilidadeModule } from './indisponibilidade/indisponibilidade.module';
 import { CultoModule } from './culto/culto.module';
 import { QualificacaoModule } from './qualificacao/qualificacao.module';
+import { MinisterioModule } from './ministerio/ministerio.module';
 
 @Module({
-  imports: [PrismaModule, PessoaModule, IndisponibilidadeModule, CultoModule, QualificacaoModule],
+  imports: [PrismaModule, PessoaModule, IndisponibilidadeModule, CultoModule, QualificacaoModule, MinisterioModule],
   controllers: [AppController],
   providers: [AppService],
 })
