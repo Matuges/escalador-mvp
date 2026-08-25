@@ -7,9 +7,10 @@ import { IndisponibilidadeModule } from './indisponibilidade/indisponibilidade.m
 import { CultoModule } from './culto/culto.module';
 import { QualificacaoModule } from './qualificacao/qualificacao.module';
 import { MinisterioModule } from './ministerio/ministerio.module';
+import { FuncaoModule } from './funcao/funcao.module';
 
 @Module({
-  imports: [PrismaModule, PessoaModule, IndisponibilidadeModule, CultoModule, QualificacaoModule, MinisterioModule],
+  imports: [PrismaModule, PessoaModule, IndisponibilidadeModule, CultoModule, QualificacaoModule, MinisterioModule, FuncaoModule],
   controllers: [AppController],
   providers: [AppService],
 })
