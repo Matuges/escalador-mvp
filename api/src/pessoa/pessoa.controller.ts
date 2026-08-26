@@ -22,6 +22,7 @@ import { CreatePessoaDto } from './dto/create-pessoa.dto';
 import { UpdatePessoaDto } from './dto/update-pessoa.dto';
 import { Pessoa } from './entities/pessoa.entity';
 import { DisponibilidadeCultoDto } from './dto/disponibilidade-culto.dto';
+import { QualificacaoFuncaoDto } from './dto/qualificacao-funcao.dto';
 
 @ApiTags('pessoa')
 @Controller('pessoa')
@@ -87,5 +88,16 @@ export class PessoaController {
   @ApiOkResponse({ type: DisponibilidadeCultoDto, isArray: true })
   async findDisponibilidade(@Param('id', ParseIntPipe) id: number) {
     return this.pessoaService.findDisponibilidade(id);
+  }
+
+  @Get(':id/qualificacoes')
+  @ApiOperation({
+    summary:
+      'Lista, para cada função, se a pessoa está qualificada para exercê-la',
+  })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiOkResponse({ type: QualificacaoFuncaoDto, isArray: true })
+  async findQualificacao(@Param('id', ParseIntPipe) id: number) {
+    return this.pessoaService.findQualificacao(id);
   }
 }
