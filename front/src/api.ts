@@ -126,8 +126,65 @@ export async function listMinisterios(): Promise<Ministerio[]> {
   return res.json()
 }
 
+export async function createMinisterio(nome: string): Promise<Ministerio> {
+  const res = await fetch(`${BASE}/ministerio`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nome }),
+  })
+  if (!res.ok) throw new Error('Erro ao criar ministério')
+  return res.json()
+}
+
+export async function updateMinisterio(id: number, nome: string): Promise<Ministerio> {
+  const res = await fetch(`${BASE}/ministerio/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nome }),
+  })
+  if (!res.ok) throw new Error('Erro ao atualizar ministério')
+  return res.json()
+}
+
+export async function deleteMinisterio(id: number): Promise<void> {
+  const res = await fetch(`${BASE}/ministerio/${id}`, { method: 'DELETE' })
+  if (!res.ok) throw new Error('Erro ao excluir ministério')
+}
+
 export async function listFuncoesPorMinisterio(ministerioId: number): Promise<Funcao[]> {
   const res = await fetch(`${BASE}/ministerio/${ministerioId}/funcao`)
   if (!res.ok) throw new Error('Erro ao buscar funções')
   return res.json()
+}
+
+export async function createFuncao(ministerioId: number, nome: string): Promise<Funcao> {
+  const res = await fetch(`${BASE}/ministerio/${ministerioId}/funcao`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nome }),
+  })
+  if (!res.ok) throw new Error('Erro ao criar função')
+  return res.json()
+}
+
+export async function updateFuncao(id: number, nome: string): Promise<Funcao> {
+  const res = await fetch(`${BASE}/funcao/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nome }),
+  })
+  if (!res.ok) throw new Error('Erro ao atualizar função')
+  return res.json()
+}
+
+export async function deleteFuncao(id: number): Promise<void> {
+  const res = await fetch(`${BASE}/funcao/${id}`, { method: 'DELETE' })
+  if (!res.ok) throw new Error('Erro ao excluir função')
+}
+
+// --- Qualificacao ---
+
+export async function setQualificacao(pessoaId: number, funcaoId: number): Promise<void> {
+  const res = await fetch(`${BASE}/pessoa/${pessoaId}/qualificacao/${funcaoId}`, { method: 'PUT' })
+  if (!res.ok) throw new Error('Erro ao associar função')
 }

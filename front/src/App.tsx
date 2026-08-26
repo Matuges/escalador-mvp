@@ -2,13 +2,15 @@ import { useState } from 'react'
 import DisponibilidadePage from './DisponibilidadePage'
 import PessoasPage from './PessoasPage'
 import CultosPage from './CultosPage'
+import MinisteriosPage from './MinisteriosPage'
 
-type Tab = 'disponibilidade' | 'pessoas' | 'cultos'
+type Tab = 'disponibilidade' | 'pessoas' | 'cultos' | 'ministerios'
 
 const tabs: { id: Tab; label: string }[] = [
   { id: 'disponibilidade', label: 'Disponibilidade' },
   { id: 'pessoas', label: 'Pessoas' },
   { id: 'cultos', label: 'Cultos' },
+  { id: 'ministerios', label: 'Ministérios' },
 ]
 
 export default function App() {
@@ -39,6 +41,7 @@ export default function App() {
         {tab === 'disponibilidade' && <DisponibilidadePage />}
         {tab === 'pessoas' && <PessoasPage />}
         {tab === 'cultos' && <CultosPage />}
+        {tab === 'ministerios' && <MinisteriosPage />}
       </main>
     </div>
   )

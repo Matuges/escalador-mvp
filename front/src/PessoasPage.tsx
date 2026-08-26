@@ -1,5 +1,16 @@
 import { useEffect, useState } from 'react'
-import { listPessoas, createPessoa, updatePessoa, deletePessoa, type Pessoa } from './api'
+import {
+  listPessoas,
+  createPessoa,
+  updatePessoa,
+  deletePessoa,
+  listMinisterios,
+  listFuncoesPorMinisterio,
+  setQualificacao,
+  type Pessoa,
+  type Ministerio,
+  type Funcao,
+} from './api'
 import { useLouvorFuncoes } from './useLouvorFuncoes'
 
 export default function PessoasPage() {
@@ -11,11 +22,33 @@ export default function PessoasPage() {
   const { funcoes, error: funcoesError } = useLouvorFuncoes()
   const [funcaoId, setFuncaoId] = useState<number | null>(null)
 
+  const [ministerios, setMinisterios] = useState<Ministerio[]>([])
+  const [newMinisterioId, setNewMinisterioId] = useState<number | null>(null)
+  const [funcoesDoMinisterio, setFuncoesDoMinisterio] = useState<Funcao[]>([])
+  const [newFuncaoId, setNewFuncaoId] = useState<number | null>(null)
+
   useEffect(() => {
     listPessoas(funcaoId ?? undefined)
       .then(setPessoas)
       .catch(() => setError('Erro ao carregar pessoas.'))
   }, [funcaoId])
+
+  useEffect(() => {
+    listMinisterios()
+      .then(setMinisterios)
+      .catch(() => setError('Erro ao carregar ministérios.'))
+  }, [])
+
+  useEffect(() => {
+    setNewFuncaoId(null)
+    if (newMinisterioId === null) {
+      setFuncoesDoMinisterio([])
+      return
+    }
+    listFuncoesPorMinisterio(newMinisterioId)
+      .then(setFuncoesDoMinisterio)
+      .catch(() => setError('Erro ao carregar funções.'))
+  }, [newMinisterioId])
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
@@ -26,6 +59,14 @@ export default function PessoasPage() {
         setPessoas((prev) => [...prev, criada])
       }
       setNewNome('')
+      if (newFuncaoId !== null) {
+        try {
+          await setQualificacao(criada.id, newFuncaoId)
+        } catch {
+          setError('Pessoa criada, mas erro ao associar função.')
+        }
+      }
+      setNewMinisterioId(null)
     } catch {
       setError('Erro ao criar pessoa.')
     }
@@ -80,14 +121,35 @@ export default function PessoasPage() {
         </select>
       </div>
 
-      <form onSubmit={handleCreate} className="flex gap-2 mb-4">
+      <form onSubmit={handleCreate} className="flex flex-wrap gap-2 mb-4">
         <input
           type="text"
           placeholder="Nome da pessoa"
           value={newNome}
           onChange={(e) => setNewNome(e.target.value)}
-          className="flex-1 border border-mist rounded-md px-3 py-2 text-sm text-espresso placeholder:text-caramel focus:outline-none focus:ring-2 focus:ring-steel"
+          className="flex-1 min-w-[10rem] border border-mist rounded-md px-3 py-2 text-sm text-espresso placeholder:text-caramel focus:outline-none focus:ring-2 focus:ring-steel"
         />
+        <select
+          className="border border-mist rounded-md px-3 py-2 bg-white text-sm text-espresso focus:outline-none focus:ring-2 focus:ring-steel"
+          value={newMinisterioId ?? ''}
+          onChange={(e) => setNewMinisterioId(e.target.value ? Number(e.target.value) : null)}
+        >
+          <option value="">Ministério...</option>
+          {ministerios.map((m) => (
+            <option key={m.id} value={m.id}>{m.nome}</option>
+          ))}
+        </select>
+        <select
+          className="border border-mist rounded-md px-3 py-2 bg-white text-sm text-espresso focus:outline-none focus:ring-2 focus:ring-steel disabled:opacity-50"
+          value={newFuncaoId ?? ''}
+          onChange={(e) => setNewFuncaoId(e.target.value ? Number(e.target.value) : null)}
+          disabled={newMinisterioId === null}
+        >
+          <option value="">Função...</option>
+          {funcoesDoMinisterio.map((f) => (
+            <option key={f.id} value={f.id}>{f.nome}</option>
+          ))}
+        </select>
         <button
           type="submit"
           className="px-4 py-2 bg-navy text-white text-sm rounded-md hover:bg-steel transition-colors"
