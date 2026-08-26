@@ -16,6 +16,7 @@ datasource db {
 model Pessoa {
   id Int @id @default(autoincrement())
   nome String
+  ativo Boolean @default(true)
 
   qualificacoes Qualificacao[]
   indisponibilidades Indisponibilidade[]
@@ -46,7 +47,7 @@ model Indisponibilidade {
 model Funcao {
   id Int @id @default(autoincrement())
   nome String
-  ministerio Ministerio @relation(fields: [ministerioId], references: [id])
+  ministerio Ministerio @relation(fields: [ministerioId], references: [id], onDelete: Cascade)
   ministerioId Int
 
   qualificacoes Qualificacao[]
@@ -64,9 +65,9 @@ model Ministerio {
 
 model Qualificacao {
   pessoa Pessoa @relation(fields: [pessoaId], references: [id])
-  funcao Funcao @relation(fields: [funcaoId], references: [id])
+  funcao Funcao @relation(fields: [funcaoId], references: [id], onDelete: Cascade)
 
-  funcaoId Int 
+  funcaoId Int
   pessoaId Int
 
   @@map("qualificacao")

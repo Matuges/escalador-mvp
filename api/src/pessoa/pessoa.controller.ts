@@ -72,11 +72,22 @@ export class PessoaController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Remove uma pessoa' })
+  @ApiOperation({
+    summary:
+      'Inativa uma pessoa (soft delete — preserva indisponibilidades e qualificações registradas)',
+  })
   @ApiParam({ name: 'id', type: Number })
   @ApiOkResponse({ type: Pessoa })
   async delete(@Param('id', ParseIntPipe) id: number) {
     return this.pessoaService.delete(id);
+  }
+
+  @Patch(':id/reativar')
+  @ApiOperation({ summary: 'Reativa uma pessoa previamente inativada' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiOkResponse({ type: Pessoa })
+  async reativar(@Param('id', ParseIntPipe) id: number) {
+    return this.pessoaService.reativar(id);
   }
 
   @Get(':id/disponibilidades')

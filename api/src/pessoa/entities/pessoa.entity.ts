@@ -6,4 +6,7 @@ export class Pessoa {
 
   @ApiProperty({ example: 'Maria Silva' })
   nome!: string;
+
+  @ApiProperty({ example: true })
+  ativo!: boolean;
 }

@@ -17,10 +17,12 @@ export class PessoaService {
 
   async findAll(funcaoId?: number) {
     return this.prisma.pessoa.findMany({
-      where:
-        funcaoId !== undefined
+      where: {
+        ativo: true,
+        ...(funcaoId !== undefined
           ? { qualificacoes: { some: { funcaoId } } }
-          : undefined,
+          : undefined),
+      },
     });
   }
 
@@ -44,7 +46,21 @@ export class PessoaService {
   }
 
   async delete(id: number) {
-    return this.prisma.pessoa.delete({
+    return this.prisma.pessoa.update({
+      data: {
+        ativo: false,
+      },
+      where: {
+        id: id,
+      },
+    });
+  }
+
+  async reativar(id: number) {
+    return this.prisma.pessoa.update({
+      data: {
+        ativo: true,
+      },
       where: {
         id: id,
       },
