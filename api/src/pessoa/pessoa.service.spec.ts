@@ -10,7 +10,6 @@ describe('PessoaService', () => {
       findMany: jest.Mock;
       findUnique: jest.Mock;
       update: jest.Mock;
-      delete: jest.Mock;
     };
     culto: { findMany: jest.Mock };
     funcao: { findMany: jest.Mock };
@@ -28,7 +27,6 @@ describe('PessoaService', () => {
               findMany: jest.fn(),
               findUnique: jest.fn(),
               update: jest.fn(),
-              delete: jest.fn(),
             },
             culto: {
               findMany: jest.fn(),
@@ -72,7 +70,9 @@ describe('PessoaService', () => {
 
     const resultado = await service.findAll();
 
-    expect(prisma.pessoa.findMany).toHaveBeenCalled();
+    expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
+      where: { ativo: true },
+    });
     expect(resultado).toEqual(pessoas);
   });
 
@@ -85,7 +85,7 @@ describe('PessoaService', () => {
     const resultado = await service.findAll(funcaoId);
 
     expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
-      where: { qualificacoes: { some: { funcaoId } } },
+      where: { ativo: true, qualificacoes: { some: { funcaoId } } },
     });
     expect(resultado).toEqual(pessoas);
   });
@@ -118,14 +118,31 @@ describe('PessoaService', () => {
     expect(resultado).toEqual(pessoaEditada);
   });
 
-  it('should remove one pessoa', async () => {
+  it('should inativar one pessoa', async () => {
     const id = 1;
-    const pessoa = { id: 1, nome: 'Mateus' };
-    prisma.pessoa.delete.mockResolvedValue(pessoa);
+    const pessoa = { id: 1, nome: 'Mateus', ativo: false };
+    prisma.pessoa.update.mockResolvedValue(pessoa);
 
     const resultado = await service.delete(id);
 
-    expect(prisma.pessoa.delete).toHaveBeenCalledWith({ where: { id } });
+    expect(prisma.pessoa.update).toHaveBeenCalledWith({
+      data: { ativo: false },
+      where: { id },
+    });
+    expect(resultado).toEqual(pessoa);
+  });
+
+  it('should reativar one pessoa', async () => {
+    const id = 1;
+    const pessoa = { id: 1, nome: 'Mateus', ativo: true };
+    prisma.pessoa.update.mockResolvedValue(pessoa);
+
+    const resultado = await service.reativar(id);
+
+    expect(prisma.pessoa.update).toHaveBeenCalledWith({
+      data: { ativo: true },
+      where: { id },
+    });
     expect(resultado).toEqual(pessoa);
   });
 
