@@ -11,7 +11,9 @@ describe.skip('IndisponibilidadeController', () => {
       providers: [IndisponibilidadeService],
     }).compile();
 
-    controller = module.get<IndisponibilidadeController>(IndisponibilidadeController);
+    controller = module.get<IndisponibilidadeController>(
+      IndisponibilidadeController,
+    );
   });
 
   it('should be defined', () => {

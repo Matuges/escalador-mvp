@@ -1,8 +1,9 @@
-import { IsNotEmpty, IsString } from "class-validator"
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateMinisterioDto {
-            @IsString()
-            @IsNotEmpty()
-            nome!: string
-    }
-    
+  @ApiProperty({ example: 'Louvor' })
+  @IsString()
+  @IsNotEmpty()
+  nome!: string;
+}

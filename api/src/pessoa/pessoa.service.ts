@@ -5,86 +5,85 @@ import { UpdatePessoaDto } from './dto/update-pessoa.dto';
 
 @Injectable()
 export class PessoaService {
-    constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-    async create(dto: CreatePessoaDto) {
-        return this.prisma.pessoa.create({
-            data: {
-                nome: dto.nome
-            }
-        }
-        )
-    }
+  async create(dto: CreatePessoaDto) {
+    return this.prisma.pessoa.create({
+      data: {
+        nome: dto.nome,
+      },
+    });
+  }
 
-    async findAll(funcaoId?: number) {
-        return this.prisma.pessoa.findMany({
-            where: funcaoId !== undefined
-                ? { qualificacoes: { some: { funcaoId } } }
-                : undefined
-        })
-    }
+  async findAll(funcaoId?: number) {
+    return this.prisma.pessoa.findMany({
+      where:
+        funcaoId !== undefined
+          ? { qualificacoes: { some: { funcaoId } } }
+          : undefined,
+    });
+  }
 
-    async findUnique(id: number) {
-        return this.prisma.pessoa.findUnique({
-            where: {
-                id: id
-            }
-        })
-    }
+  async findUnique(id: number) {
+    return this.prisma.pessoa.findUnique({
+      where: {
+        id: id,
+      },
+    });
+  }
 
-    async update(id: number, dto: UpdatePessoaDto) {
-        return this.prisma.pessoa.update({
-            data: {
-                nome: dto.nome
-            },
-            where: {
-                id: id
-            }
-        })
-    }
+  async update(id: number, dto: UpdatePessoaDto) {
+    return this.prisma.pessoa.update({
+      data: {
+        nome: dto.nome,
+      },
+      where: {
+        id: id,
+      },
+    });
+  }
 
-    async delete(id: number) {
-        return this.prisma.pessoa.delete({
-            where: {
-                id: id
-            }
-        })
-    }
+  async delete(id: number) {
+    return this.prisma.pessoa.delete({
+      where: {
+        id: id,
+      },
+    });
+  }
 
-    async findDisponibilidade(id: number) {
-        const cultos = await this.prisma.culto.findMany({
-            include: {
-                indisponibilidades: {
-                    where: {pessoaId: id}
-                }
-            }      
-        })
+  async findDisponibilidade(id: number) {
+    const cultos = await this.prisma.culto.findMany({
+      include: {
+        indisponibilidades: {
+          where: { pessoaId: id },
+        },
+      },
+    });
 
-        return (cultos).map((culto) => ({
-            culto: culto.nome,
-            id: culto.id,
-            data: culto.data,
-            disponivel: culto.indisponibilidades.length === 0 
-        }))
-    }
+    return cultos.map((culto) => ({
+      culto: culto.nome,
+      id: culto.id,
+      data: culto.data,
+      disponivel: culto.indisponibilidades.length === 0,
+    }));
+  }
 
-     async findQualificacao(id: number) {
-        const funcoes = await this.prisma.funcao.findMany({
-            include: {
-                qualificacoes: {
-                    where: {pessoaId: id}
-                },
-                ministerio: true
-            }      
-        })
+  async findQualificacao(id: number) {
+    const funcoes = await this.prisma.funcao.findMany({
+      include: {
+        qualificacoes: {
+          where: { pessoaId: id },
+        },
+        ministerio: true,
+      },
+    });
 
-        return (funcoes).map((funcao) => ({
-            funcao: funcao.nome,
-            id: funcao.id,
-            qualificado: funcao.qualificacoes.length > 0,
-            ministerio: funcao.ministerio.nome,
-            ministerioId: funcao.ministerio.id
-        }))
-    }
+    return funcoes.map((funcao) => ({
+      funcao: funcao.nome,
+      id: funcao.id,
+      qualificado: funcao.qualificacoes.length > 0,
+      ministerio: funcao.ministerio.nome,
+      ministerioId: funcao.ministerio.id,
+    }));
+  }
 }
-

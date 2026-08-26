@@ -1,7 +1,9 @@
-import { IsNotEmpty, IsString } from "class-validator"
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateFuncaoDto {
-    @IsString()
-    @IsNotEmpty()
-    nome!: string
+  @ApiProperty({ example: 'Vocalista' })
+  @IsString()
+  @IsNotEmpty()
+  nome!: string;
 }

@@ -1,11 +1,17 @@
-import { IsNotEmpty, IsNumber } from "class-validator"
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class MesCultoDto {
-    @IsNumber()
-    @IsNotEmpty()
-    ano!: number
+  @ApiProperty({ example: 2026 })
+  @IsNumber()
+  @IsNotEmpty()
+  ano!: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    mes!: number
+  @ApiProperty({
+    example: 8,
+    description: 'Mês de 1 (janeiro) a 12 (dezembro)',
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  mes!: number;
 }

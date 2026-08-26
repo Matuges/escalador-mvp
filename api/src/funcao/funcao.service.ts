@@ -5,41 +5,41 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class FuncaoService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(ministerioId: number, dto: CreateFuncaoDto) {
     return this.prisma.funcao.create({
       data: {
         nome: dto.nome,
-        ministerioId
-      }
-    })
+        ministerioId,
+      },
+    });
   }
 
   async findAllByMinisterio(ministerioId: number) {
     return this.prisma.funcao.findMany({
-      where: { ministerioId }
-    })
+      where: { ministerioId },
+    });
   }
 
   async findUnique(id: number) {
     return this.prisma.funcao.findUnique({
-      where: { id }
-    })
+      where: { id },
+    });
   }
 
   async update(id: number, dto: UpdateFuncaoDto) {
     return this.prisma.funcao.update({
       data: {
-        nome: dto.nome
+        nome: dto.nome,
       },
-      where: { id }
-    })
+      where: { id },
+    });
   }
 
   async delete(id: number) {
     return this.prisma.funcao.delete({
-      where: { id }
-    })
+      where: { id },
+    });
   }
 }
