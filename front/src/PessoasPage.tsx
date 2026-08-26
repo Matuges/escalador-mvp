@@ -11,7 +11,6 @@ import {
   type Ministerio,
   type Funcao,
 } from './api'
-import { useLouvorFuncoes } from './useLouvorFuncoes'
 
 export default function PessoasPage() {
   const [pessoas, setPessoas] = useState<Pessoa[]>([])
@@ -19,10 +18,13 @@ export default function PessoasPage() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editNome, setEditNome] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const { funcoes, error: funcoesError } = useLouvorFuncoes()
-  const [funcaoId, setFuncaoId] = useState<number | null>(null)
 
   const [ministerios, setMinisterios] = useState<Ministerio[]>([])
+
+  const [filtroMinisterioId, setFiltroMinisterioId] = useState<number | null>(null)
+  const [funcoesFiltro, setFuncoesFiltro] = useState<Funcao[]>([])
+  const [funcaoId, setFuncaoId] = useState<number | null>(null)
+
   const [newMinisterioId, setNewMinisterioId] = useState<number | null>(null)
   const [funcoesDoMinisterio, setFuncoesDoMinisterio] = useState<Funcao[]>([])
   const [newFuncaoId, setNewFuncaoId] = useState<number | null>(null)
@@ -38,6 +40,17 @@ export default function PessoasPage() {
       .then(setMinisterios)
       .catch(() => setError('Erro ao carregar ministérios.'))
   }, [])
+
+  useEffect(() => {
+    setFuncaoId(null)
+    if (filtroMinisterioId === null) {
+      setFuncoesFiltro([])
+      return
+    }
+    listFuncoesPorMinisterio(filtroMinisterioId)
+      .then(setFuncoesFiltro)
+      .catch(() => setError('Erro ao carregar funções.'))
+  }, [filtroMinisterioId])
 
   useEffect(() => {
     setNewFuncaoId(null)
@@ -101,24 +114,40 @@ export default function PessoasPage() {
     <div>
       <h2 className="text-lg font-semibold text-navy mb-4">Pessoas</h2>
 
-      {(error ?? funcoesError) && (
+      {error && (
         <div className="mb-4 rounded-md bg-sand/20 border border-caramel px-4 py-3 text-sm text-espresso">
-          {error ?? funcoesError}
+          {error}
         </div>
       )}
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-navy mb-1">Função</label>
-        <select
-          className="w-full border border-mist rounded-md px-3 py-2 bg-white text-espresso focus:outline-none focus:ring-2 focus:ring-steel"
-          value={funcaoId ?? ''}
-          onChange={(e) => setFuncaoId(e.target.value ? Number(e.target.value) : null)}
-        >
-          <option value="">Todas</option>
-          {funcoes.map((f) => (
-            <option key={f.id} value={f.id}>{f.nome}</option>
-          ))}
-        </select>
+      <div className="mb-4 flex gap-2">
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-navy mb-1">Ministério</label>
+          <select
+            className="w-full border border-mist rounded-md px-3 py-2 bg-white text-espresso focus:outline-none focus:ring-2 focus:ring-steel"
+            value={filtroMinisterioId ?? ''}
+            onChange={(e) => setFiltroMinisterioId(e.target.value ? Number(e.target.value) : null)}
+          >
+            <option value="">Todos</option>
+            {ministerios.map((m) => (
+              <option key={m.id} value={m.id}>{m.nome}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-navy mb-1">Função</label>
+          <select
+            className="w-full border border-mist rounded-md px-3 py-2 bg-white text-espresso focus:outline-none focus:ring-2 focus:ring-steel disabled:opacity-50"
+            value={funcaoId ?? ''}
+            onChange={(e) => setFuncaoId(e.target.value ? Number(e.target.value) : null)}
+            disabled={filtroMinisterioId === null}
+          >
+            <option value="">Todas</option>
+            {funcoesFiltro.map((f) => (
+              <option key={f.id} value={f.id}>{f.nome}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <form onSubmit={handleCreate} className="flex flex-wrap gap-2 mb-4">
