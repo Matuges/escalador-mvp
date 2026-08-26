@@ -10,7 +10,15 @@ import { MinisterioModule } from './ministerio/ministerio.module';
 import { FuncaoModule } from './funcao/funcao.module';
 
 @Module({
-  imports: [PrismaModule, PessoaModule, IndisponibilidadeModule, CultoModule, QualificacaoModule, MinisterioModule, FuncaoModule],
+  imports: [
+    PrismaModule,
+    PessoaModule,
+    IndisponibilidadeModule,
+    CultoModule,
+    QualificacaoModule,
+    MinisterioModule,
+    FuncaoModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -4,20 +4,21 @@ import { PrismaService } from '../prisma/prisma.service';
 
 describe('QualificacaoService', () => {
   let service: QualificacaoService;
-  let prisma: { qualificacao: { upsert: jest.Mock, deleteMany: jest.Mock } };
+  let prisma: { qualificacao: { upsert: jest.Mock; deleteMany: jest.Mock } };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [QualificacaoService,
+      providers: [
+        QualificacaoService,
         {
           provide: PrismaService,
           useValue: {
             qualificacao: {
               upsert: jest.fn(),
-              deleteMany: jest.fn()
-            }
-          }
-        }
+              deleteMany: jest.fn(),
+            },
+          },
+        },
       ],
     }).compile();
 
@@ -41,10 +42,10 @@ describe('QualificacaoService', () => {
     expect(prisma.qualificacao.upsert).toHaveBeenCalledWith({
       create: { pessoaId, funcaoId },
       update: {},
-      where: { pessoaId_funcaoId: { pessoaId, funcaoId } }
+      where: { pessoaId_funcaoId: { pessoaId, funcaoId } },
     });
     expect(resultado).toEqual(qualificacaoCriada);
-  })
+  });
 
   it('should remove a qualificacao', async () => {
     const pessoaId = 1;
@@ -56,10 +57,10 @@ describe('QualificacaoService', () => {
     const resultado = await service.removeQualificacao(pessoaId, funcaoId);
 
     expect(prisma.qualificacao.deleteMany).toHaveBeenCalledWith({
-      where: { pessoaId, funcaoId }
+      where: { pessoaId, funcaoId },
     });
     expect(resultado).toEqual(removida);
-  })
+  });
 
   it('should not throw when removing a qualificacao that does not exist', async () => {
     const pessoaId = 1;
@@ -70,5 +71,5 @@ describe('QualificacaoService', () => {
     const resultado = await service.removeQualificacao(pessoaId, funcaoId);
 
     expect(resultado).toEqual({ count: 0 });
-  })
+  });
 });
