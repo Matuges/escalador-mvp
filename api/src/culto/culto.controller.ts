@@ -104,7 +104,7 @@ export class CultoController {
   @Get(':id/disponibilidades')
   @ApiOperation({
     summary:
-      'Lista, para cada pessoa (opcionalmente filtrada por função), se ela está disponível para servir nesse culto',
+      'Lista, para cada pessoa (opcionalmente filtrada por função ou ministério), se ela está disponível para servir nesse culto',
   })
   @ApiParam({ name: 'id', type: Number })
   @ApiQuery({
@@ -113,11 +113,20 @@ export class CultoController {
     type: Number,
     description: 'Filtra só pessoas qualificadas para essa função',
   })
+  @ApiQuery({
+    name: 'ministerioId',
+    required: false,
+    type: Number,
+    description:
+      'Filtra só pessoas com ao menos uma qualificação em função desse ministério. Ignorado se funcaoId também vier.',
+  })
   @ApiOkResponse({ type: DisponibilidadePessoaDto, isArray: true })
   async findDisponibilidade(
     @Param('id', ParseIntPipe) id: number,
     @Query('funcaoId', new ParseIntPipe({ optional: true })) funcaoId?: number,
+    @Query('ministerioId', new ParseIntPipe({ optional: true }))
+    ministerioId?: number,
   ) {
-    return this.cultoService.findDisponibilidade(id, funcaoId);
+    return this.cultoService.findDisponibilidade(id, funcaoId, ministerioId);
   }
 }
