@@ -4,6 +4,7 @@ import {
   createPessoa,
   updatePessoa,
   deletePessoa,
+  reativarPessoa,
   listMinisterios,
   listFuncoesPorMinisterio,
   setQualificacao,
@@ -33,7 +34,7 @@ export default function PessoasPage() {
   const [pessoaSelecionada, setPessoaSelecionada] = useState<Pessoa | null>(null)
 
   useEffect(() => {
-    listPessoas(funcaoId ?? undefined)
+    listPessoas(funcaoId ?? undefined, true)
       .then(setPessoas)
       .catch(() => setError('Erro ao carregar pessoas.'))
   }, [funcaoId])
@@ -107,9 +108,18 @@ export default function PessoasPage() {
   async function handleDelete(id: number) {
     try {
       await deletePessoa(id)
-      setPessoas((prev) => prev.filter((p) => p.id !== id))
+      setPessoas((prev) => prev.map((p) => (p.id === id ? { ...p, ativo: false } : p)))
     } catch {
       setError('Erro ao excluir pessoa.')
+    }
+  }
+
+  async function handleReativar(id: number) {
+    try {
+      const reativada = await reativarPessoa(id)
+      setPessoas((prev) => prev.map((p) => (p.id === id ? reativada : p)))
+    } catch {
+      setError('Erro ao reativar pessoa.')
     }
   }
 
@@ -206,7 +216,9 @@ export default function PessoasPage() {
         {pessoas.map((p) => (
           <div
             key={p.id}
-            className="flex items-center gap-2 bg-white border border-mist rounded-md px-4 py-2"
+            className={`flex items-center gap-2 bg-white border border-mist rounded-md px-4 py-2 ${
+              p.ativo ? '' : 'opacity-60'
+            }`}
           >
             {editingId === p.id ? (
               <>
@@ -241,6 +253,7 @@ export default function PessoasPage() {
                   className="flex-1 text-espresso cursor-pointer hover:underline"
                 >
                   {p.nome}
+                  {!p.ativo && <span className="ml-2 text-xs text-caramel">(inativo)</span>}
                 </span>
                 <button
                   onClick={() => startEdit(p)}
@@ -248,12 +261,21 @@ export default function PessoasPage() {
                 >
                   Editar
                 </button>
-                <button
-                  onClick={() => handleDelete(p.id)}
-                  className="text-sm text-caramel hover:text-espresso"
-                >
-                  Excluir
-                </button>
+                {p.ativo ? (
+                  <button
+                    onClick={() => handleDelete(p.id)}
+                    className="text-sm text-caramel hover:text-espresso"
+                  >
+                    Excluir
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleReativar(p.id)}
+                    className="text-sm text-steel hover:text-navy"
+                  >
+                    Reativar
+                  </button>
+                )}
               </>
             )}
           </div>

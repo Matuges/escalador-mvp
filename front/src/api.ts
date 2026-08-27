@@ -1,6 +1,6 @@
 const BASE = '/api'
 
-export type Pessoa = { id: number; nome: string }
+export type Pessoa = { id: number; nome: string; ativo: boolean }
 export type Culto = { id: number; nome: string; data: string }
 export type DisponibilidadeItem = { id: number; culto: string; data: string; disponivel: boolean }
 export type CultoDisponibilidadeItem = { id: number; pessoa: string; disponivel: boolean }
@@ -17,9 +17,12 @@ export type QualificacaoFuncao = {
 
 // --- Pessoas ---
 
-export async function listPessoas(funcaoId?: number): Promise<Pessoa[]> {
-  const url = funcaoId != null ? `${BASE}/pessoa?funcaoId=${funcaoId}` : `${BASE}/pessoa`
-  const res = await fetch(url)
+export async function listPessoas(funcaoId?: number, incluirInativos?: boolean): Promise<Pessoa[]> {
+  const params = new URLSearchParams()
+  if (funcaoId != null) params.set('funcaoId', String(funcaoId))
+  if (incluirInativos) params.set('incluirInativos', 'true')
+  const query = params.toString()
+  const res = await fetch(`${BASE}/pessoa${query ? `?${query}` : ''}`)
   if (!res.ok) throw new Error('Erro ao buscar pessoas')
   return res.json()
 }
@@ -47,6 +50,12 @@ export async function updatePessoa(id: number, nome: string): Promise<Pessoa> {
 export async function deletePessoa(id: number): Promise<void> {
   const res = await fetch(`${BASE}/pessoa/${id}`, { method: 'DELETE' })
   if (!res.ok) throw new Error('Erro ao deletar pessoa')
+}
+
+export async function reativarPessoa(id: number): Promise<Pessoa> {
+  const res = await fetch(`${BASE}/pessoa/${id}/reativar`, { method: 'PATCH' })
+  if (!res.ok) throw new Error('Erro ao reativar pessoa')
+  return res.json()
 }
 
 // --- Cultos ---
