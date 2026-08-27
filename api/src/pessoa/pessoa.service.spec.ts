@@ -90,6 +90,22 @@ describe('PessoaService', () => {
     expect(resultado).toEqual(pessoas);
   });
 
+  it('should find all pessoas including inativas', async () => {
+    const pessoas = [
+      { id: 1, nome: 'Maria', ativo: true },
+      { id: 2, nome: 'João', ativo: false },
+    ];
+
+    prisma.pessoa.findMany.mockResolvedValue(pessoas);
+
+    const resultado = await service.findAll(undefined, true);
+
+    expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
+      where: {},
+    });
+    expect(resultado).toEqual(pessoas);
+  });
+
   it('should find one pessoa', async () => {
     const pessoa = { id: 1, nome: 'Maria' };
     const id = 1;

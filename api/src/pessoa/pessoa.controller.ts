@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseBoolPipe,
   ParseIntPipe,
   Patch,
   Post,
@@ -46,11 +47,19 @@ export class PessoaController {
     type: Number,
     description: 'Filtra só pessoas qualificadas para essa função',
   })
+  @ApiQuery({
+    name: 'incluirInativos',
+    required: false,
+    type: Boolean,
+    description: 'Se true, inclui também pessoas inativadas na listagem',
+  })
   @ApiOkResponse({ type: Pessoa, isArray: true })
   async findAll(
     @Query('funcaoId', new ParseIntPipe({ optional: true })) funcaoId?: number,
+    @Query('incluirInativos', new ParseBoolPipe({ optional: true }))
+    incluirInativos?: boolean,
   ) {
-    return this.pessoaService.findAll(funcaoId);
+    return this.pessoaService.findAll(funcaoId, incluirInativos);
   }
 
   @Get(':id')
