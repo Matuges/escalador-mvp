@@ -27,6 +27,12 @@ export async function listPessoas(funcaoId?: number, incluirInativos?: boolean):
   return res.json()
 }
 
+export async function getPessoa(id: number): Promise<Pessoa> {
+  const res = await fetch(`${BASE}/pessoa/${id}`)
+  if (!res.ok) throw new Error('Erro ao buscar pessoa')
+  return res.json()
+}
+
 export async function createPessoa(nome: string): Promise<Pessoa> {
   const res = await fetch(`${BASE}/pessoa`, {
     method: 'POST',
@@ -63,6 +69,12 @@ export async function reativarPessoa(id: number): Promise<Pessoa> {
 export async function listCultos(): Promise<Culto[]> {
   const res = await fetch(`${BASE}/culto`)
   if (!res.ok) throw new Error('Erro ao buscar cultos')
+  return res.json()
+}
+
+export async function getCulto(id: number): Promise<Culto> {
+  const res = await fetch(`${BASE}/culto/${id}`)
+  if (!res.ok) throw new Error('Erro ao buscar culto')
   return res.json()
 }
 
