@@ -39,13 +39,20 @@ export class PessoaController {
 
   @Get()
   @ApiOperation({
-    summary: 'Lista pessoas, opcionalmente filtradas por função',
+    summary: 'Lista pessoas, opcionalmente filtradas por função ou ministério',
   })
   @ApiQuery({
     name: 'funcaoId',
     required: false,
     type: Number,
     description: 'Filtra só pessoas qualificadas para essa função',
+  })
+  @ApiQuery({
+    name: 'ministerioId',
+    required: false,
+    type: Number,
+    description:
+      'Filtra só pessoas com ao menos uma qualificação em função desse ministério. Ignorado se funcaoId também vier.',
   })
   @ApiQuery({
     name: 'incluirInativos',
@@ -58,8 +65,10 @@ export class PessoaController {
     @Query('funcaoId', new ParseIntPipe({ optional: true })) funcaoId?: number,
     @Query('incluirInativos', new ParseBoolPipe({ optional: true }))
     incluirInativos?: boolean,
+    @Query('ministerioId', new ParseIntPipe({ optional: true }))
+    ministerioId?: number,
   ) {
-    return this.pessoaService.findAll(funcaoId, incluirInativos);
+    return this.pessoaService.findAll(funcaoId, incluirInativos, ministerioId);
   }
 
   @Get(':id')

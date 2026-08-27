@@ -87,12 +87,21 @@ export class CultoService {
     });
   }
 
-  async findDisponibilidade(id: number, funcaoId?: number) {
+  async findDisponibilidade(
+    id: number,
+    funcaoId?: number,
+    ministerioId?: number,
+  ) {
+    const filtroQualificacao =
+      funcaoId !== undefined
+        ? { some: { funcaoId } }
+        : ministerioId !== undefined
+          ? { some: { funcao: { ministerioId } } }
+          : undefined;
     const pessoas = await this.prisma.pessoa.findMany({
-      where:
-        funcaoId !== undefined
-          ? { qualificacoes: { some: { funcaoId } } }
-          : undefined,
+      where: filtroQualificacao
+        ? { qualificacoes: filtroQualificacao }
+        : undefined,
       include: {
         indisponibilidades: {
           where: { cultoId: id },

@@ -90,6 +90,38 @@ describe('PessoaService', () => {
     expect(resultado).toEqual(pessoas);
   });
 
+  it('should find pessoas qualified for any funcao of a ministerio', async () => {
+    const ministerioId = 3;
+    const pessoas = [{ id: 1, nome: 'Maria' }];
+
+    prisma.pessoa.findMany.mockResolvedValue(pessoas);
+
+    const resultado = await service.findAll(undefined, undefined, ministerioId);
+
+    expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
+      where: {
+        ativo: true,
+        qualificacoes: { some: { funcao: { ministerioId } } },
+      },
+    });
+    expect(resultado).toEqual(pessoas);
+  });
+
+  it('should prefer funcaoId over ministerioId when both are given', async () => {
+    const funcaoId = 1;
+    const ministerioId = 3;
+    const pessoas = [{ id: 1, nome: 'Maria' }];
+
+    prisma.pessoa.findMany.mockResolvedValue(pessoas);
+
+    const resultado = await service.findAll(funcaoId, undefined, ministerioId);
+
+    expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
+      where: { ativo: true, qualificacoes: { some: { funcaoId } } },
+    });
+    expect(resultado).toEqual(pessoas);
+  });
+
   it('should find all pessoas including inativas', async () => {
     const pessoas = [
       { id: 1, nome: 'Maria', ativo: true },

@@ -15,12 +15,22 @@ export class PessoaService {
     });
   }
 
-  async findAll(funcaoId?: number, incluirInativos?: boolean) {
+  async findAll(
+    funcaoId?: number,
+    incluirInativos?: boolean,
+    ministerioId?: number,
+  ) {
+    const filtroQualificacao =
+      funcaoId !== undefined
+        ? { some: { funcaoId } }
+        : ministerioId !== undefined
+          ? { some: { funcao: { ministerioId } } }
+          : undefined;
     return this.prisma.pessoa.findMany({
       where: {
         ...(incluirInativos ? undefined : { ativo: true }),
-        ...(funcaoId !== undefined
-          ? { qualificacoes: { some: { funcaoId } } }
+        ...(filtroQualificacao
+          ? { qualificacoes: filtroQualificacao }
           : undefined),
       },
     });

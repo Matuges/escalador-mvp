@@ -226,4 +226,53 @@ describe('CultoService', () => {
       })),
     );
   });
+
+  it('should find disponibilidades for a culto filtered by ministerio', async () => {
+    const id = 1;
+    const ministerioId = 3;
+    const pessoas = [{ id: 1, nome: 'Maria', indisponibilidades: [] }];
+    prisma.pessoa.findMany.mockResolvedValue(pessoas);
+
+    const resultado = await service.findDisponibilidade(
+      id,
+      undefined,
+      ministerioId,
+    );
+
+    expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
+      where: { qualificacoes: { some: { funcao: { ministerioId } } } },
+      include: {
+        indisponibilidades: {
+          where: { cultoId: id },
+        },
+      },
+    });
+
+    expect(resultado).toEqual(
+      pessoas.map((pessoa) => ({
+        pessoa: pessoa.nome,
+        id: pessoa.id,
+        disponivel: pessoa.indisponibilidades.length === 0,
+      })),
+    );
+  });
+
+  it('should prefer funcaoId over ministerioId when both are given', async () => {
+    const id = 1;
+    const funcaoId = 2;
+    const ministerioId = 3;
+    const pessoas = [{ id: 1, nome: 'Maria', indisponibilidades: [] }];
+    prisma.pessoa.findMany.mockResolvedValue(pessoas);
+
+    await service.findDisponibilidade(id, funcaoId, ministerioId);
+
+    expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
+      where: { qualificacoes: { some: { funcaoId } } },
+      include: {
+        indisponibilidades: {
+          where: { cultoId: id },
+        },
+      },
+    });
+  });
 });
