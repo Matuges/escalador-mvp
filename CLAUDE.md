@@ -92,6 +92,8 @@ Disponibilidade registrada por culto (não por data): o culto já carrega a data
 .env fica em /api/.env (contém DATABASE_URL), nunca versionado. Versione um .env.example com as chaves vazias.
 .gitignore na raiz cobre o monorepo inteiro (node_modules, dist, .env).
 
+Caso vá implementar algo utilize os conceitos de boas praticas e codigo limpo
+
 # Modo de trabalho — projeto de estudo
 
 Este é um projeto de estudo. O objetivo não é entregar rápido, é eu aprender. Portanto:
