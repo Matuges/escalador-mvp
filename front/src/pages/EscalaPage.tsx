@@ -10,8 +10,10 @@ import {
 } from '../api'
 import { useToast } from '../lib/toast'
 import { fmtDataLonga, parseCultoDate, inicioDeHoje } from '../lib/dates'
+import { cx } from '../lib/cx'
 import { PageHeader } from '../components/PageHeader'
 import { Card } from '../components/Card'
+import { controlClass } from '../components/Field'
 import { CultoStrip } from '../components/CultoStrip'
 import { Segmented } from '../components/Segmented'
 import { EmptyState } from '../components/EmptyState'
@@ -30,6 +32,7 @@ export function EscalaPage() {
 
   const [cultos, setCultos] = useState<Culto[] | null>(null)
   const [mf, setMf] = useState<MinisterioFuncao>({ ministerioId: null, funcaoId: null })
+  const [busca, setBusca] = useState('')
   const [status, setStatus] = useState<Status>('todos')
 
   const [pessoas, setPessoas] = useState<CultoDisponibilidadeItem[] | null>(null)
@@ -75,12 +78,14 @@ export function EscalaPage() {
 
   const exibidas = useMemo(() => {
     if (!pessoas) return []
+    const termo = busca.trim().toLowerCase()
     return pessoas
       .filter((p) =>
         status === 'disponiveis' ? p.disponivel : status === 'indisponiveis' ? !p.disponivel : true,
       )
+      .filter((p) => p.pessoa.toLowerCase().includes(termo))
       .sort((a, b) => a.pessoa.localeCompare(b.pessoa, 'pt-BR'))
-  }, [pessoas, status])
+  }, [pessoas, status, busca])
 
   async function alternar(pessoaId: number, disponivel: boolean) {
     if (cultoId == null) return
@@ -141,6 +146,12 @@ export function EscalaPage() {
       {cultoSelecionado && (
         <>
           <Card className="mt-4 p-4">
+            <input
+              className={cx(controlClass, 'mb-3')}
+              placeholder="Buscar por nome…"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+            />
             <MinisterioFuncaoSelect value={mf} onChange={setMf} modo="filtro" />
           </Card>
 
@@ -170,7 +181,14 @@ export function EscalaPage() {
                 }
               />
             ) : exibidas.length === 0 ? (
-              <EmptyState titulo="Nada neste filtro" descricao="Ajuste o filtro acima para ver mais pessoas." />
+              <EmptyState
+                titulo="Nada neste filtro"
+                descricao={
+                  busca.trim()
+                    ? 'Nenhuma pessoa bate com a busca. Ajuste o texto ou os filtros acima.'
+                    : 'Ajuste o filtro acima para ver mais pessoas.'
+                }
+              />
             ) : (
               <ul className="space-y-2">
                 {exibidas.map((p) => (
