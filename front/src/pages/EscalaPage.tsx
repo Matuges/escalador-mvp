@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import {
   listCultos,
   findDisponibilidadesPorCulto,
@@ -39,31 +39,38 @@ export function EscalaPage() {
   const [ocupada, setOcupada] = useState<number | null>(null)
 
   useEffect(() => {
+    let ativo = true
     listCultos()
-      .then(setCultos)
-      .catch(() => notificar('Não foi possível carregar os cultos.'))
+      .then((cs) => ativo && setCultos(cs))
+      .catch(() => ativo && notificar('Não foi possível carregar os cultos.'))
+    return () => {
+      ativo = false
+    }
   }, [notificar])
 
-  // Sem culto na URL: seleciona o próximo (ou o mais recente, se todos passaram).
   useEffect(() => {
-    if (cultoId != null || !cultos || cultos.length === 0) return
+    if (cultoId == null) return
+    let ativo = true
+    findDisponibilidadesPorCulto(cultoId, mf.funcaoId ?? undefined, mf.ministerioId ?? undefined)
+      .then((ps) => ativo && setPessoas(ps))
+      .catch(() => ativo && notificar('Não foi possível carregar as pessoas.'))
+    return () => {
+      ativo = false
+    }
+  }, [cultoId, mf.funcaoId, mf.ministerioId, notificar])
+
+  // Sem culto na URL: redireciona pro próximo (ou o mais recente, se todos passaram).
+  const cultoAlvo = useMemo(() => {
+    if (cultoId != null || !cultos || cultos.length === 0) return null
     const hoje = inicioDeHoje().getTime()
     const ordenados = [...cultos].sort(
       (a, b) => parseCultoDate(a.data).getTime() - parseCultoDate(b.data).getTime(),
     )
-    const alvo =
+    return (
       ordenados.find((c) => parseCultoDate(c.data).getTime() >= hoje) ??
       ordenados[ordenados.length - 1]
-    navigate(`/escala/${alvo.id}`, { replace: true })
-  }, [cultoId, cultos, navigate])
-
-  useEffect(() => {
-    if (cultoId == null) return
-    setPessoas(null)
-    findDisponibilidadesPorCulto(cultoId, mf.funcaoId ?? undefined, mf.ministerioId ?? undefined)
-      .then(setPessoas)
-      .catch(() => notificar('Não foi possível carregar as pessoas.'))
-  }, [cultoId, mf.funcaoId, mf.ministerioId, notificar])
+    )
+  }, [cultoId, cultos])
 
   const cultoSelecionado = useMemo(
     () => cultos?.find((c) => c.id === cultoId) ?? null,
@@ -104,6 +111,10 @@ export function EscalaPage() {
     } finally {
       setOcupada(null)
     }
+  }
+
+  if (cultoAlvo) {
+    return <Navigate to={`/escala/${cultoAlvo.id}`} replace />
   }
 
   if (cultos && cultos.length === 0) {

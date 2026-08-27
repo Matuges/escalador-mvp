@@ -20,7 +20,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const notificar = useCallback(
     (mensagem: string, tone: Tone = 'erro') => {
       const id = Date.now() + Math.random()
-      setToasts((prev) => [...prev, { id, mensagem, tone }])
+      // Já existe um toast igual? Remove o antigo e reinsere — reinicia o timer
+      // em vez de empilhar duplicatas.
+      setToasts((prev) => [
+        ...prev.filter((t) => t.mensagem !== mensagem || t.tone !== tone),
+        { id, mensagem, tone },
+      ])
       window.setTimeout(() => remover(id), 5000)
     },
     [remover],

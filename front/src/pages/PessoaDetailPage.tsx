@@ -53,21 +53,29 @@ export function PessoaDetailPage() {
       setNaoEncontrada(true)
       return
     }
-    getPessoa(pessoaId)
-      .then((p) => {
-        if (!p) setNaoEncontrada(true)
+    let ativo = true
+    Promise.allSettled([
+      getPessoa(pessoaId),
+      listQualificacoes(pessoaId),
+      findDisponibilidades(pessoaId),
+    ]).then(([pessoaRes, qualRes, dispRes]) => {
+      if (!ativo) return
+      if (pessoaRes.status === 'fulfilled') {
+        if (!pessoaRes.value) setNaoEncontrada(true)
         else {
-          setPessoa(p)
-          setNome(p.nome)
+          setPessoa(pessoaRes.value)
+          setNome(pessoaRes.value.nome)
         }
-      })
-      .catch(() => notificar('Não foi possível carregar a pessoa.'))
-    listQualificacoes(pessoaId)
-      .then(setQualificacoes)
-      .catch(() => notificar('Não foi possível carregar as qualificações.'))
-    findDisponibilidades(pessoaId)
-      .then(setDisponibilidades)
-      .catch(() => notificar('Não foi possível carregar a disponibilidade.'))
+      }
+      if (qualRes.status === 'fulfilled') setQualificacoes(qualRes.value)
+      if (dispRes.status === 'fulfilled') setDisponibilidades(dispRes.value)
+      if ([pessoaRes, qualRes, dispRes].some((r) => r.status === 'rejected')) {
+        notificar('Não foi possível carregar alguns dados da pessoa.')
+      }
+    })
+    return () => {
+      ativo = false
+    }
   }, [pessoaId, notificar])
 
   const porMinisterio = useMemo(() => {

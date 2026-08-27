@@ -41,10 +41,13 @@ export function PessoasPage() {
   const [editNome, setEditNome] = useState('')
 
   useEffect(() => {
-    setPessoas(null)
+    let ativo = true
     listPessoas(filtro.funcaoId ?? undefined, incluirInativos, filtro.ministerioId ?? undefined)
-      .then(setPessoas)
-      .catch(() => notificar('Não foi possível carregar as pessoas.'))
+      .then((ps) => ativo && setPessoas(ps))
+      .catch(() => ativo && notificar('Não foi possível carregar as pessoas.'))
+    return () => {
+      ativo = false
+    }
   }, [filtro.funcaoId, filtro.ministerioId, incluirInativos, recarga, notificar])
 
   const exibidas = useMemo(() => {
