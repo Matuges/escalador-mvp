@@ -60,10 +60,10 @@ export function EscalaPage() {
   useEffect(() => {
     if (cultoId == null) return
     setPessoas(null)
-    findDisponibilidadesPorCulto(cultoId, mf.funcaoId ?? undefined)
+    findDisponibilidadesPorCulto(cultoId, mf.funcaoId ?? undefined, mf.ministerioId ?? undefined)
       .then(setPessoas)
       .catch(() => notificar('Não foi possível carregar as pessoas.'))
-  }, [cultoId, mf.funcaoId, notificar])
+  }, [cultoId, mf.funcaoId, mf.ministerioId, notificar])
 
   const cultoSelecionado = useMemo(
     () => cultos?.find((c) => c.id === cultoId) ?? null,
@@ -177,7 +177,9 @@ export function EscalaPage() {
                 descricao={
                   mf.funcaoId
                     ? 'Nenhuma pessoa está qualificada para essa função.'
-                    : 'Nenhuma pessoa cadastrada ainda.'
+                    : mf.ministerioId
+                      ? 'Nenhuma pessoa tem função nesse ministério.'
+                      : 'Nenhuma pessoa cadastrada ainda.'
                 }
               />
             ) : exibidas.length === 0 ? (

@@ -42,10 +42,10 @@ export function PessoasPage() {
 
   useEffect(() => {
     setPessoas(null)
-    listPessoas(filtro.funcaoId ?? undefined, incluirInativos)
+    listPessoas(filtro.funcaoId ?? undefined, incluirInativos, filtro.ministerioId ?? undefined)
       .then(setPessoas)
       .catch(() => notificar('Não foi possível carregar as pessoas.'))
-  }, [filtro.funcaoId, incluirInativos, recarga, notificar])
+  }, [filtro.funcaoId, filtro.ministerioId, incluirInativos, recarga, notificar])
 
   const exibidas = useMemo(() => {
     const termo = busca.trim().toLowerCase()
@@ -54,7 +54,11 @@ export function PessoasPage() {
       .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
   }, [pessoas, busca])
 
-  const temFiltro = busca.trim() !== '' || filtro.funcaoId != null || incluirInativos
+  const temFiltro =
+    busca.trim() !== '' ||
+    filtro.funcaoId != null ||
+    filtro.ministerioId != null ||
+    incluirInativos
 
   async function criar(e: React.FormEvent) {
     e.preventDefault()

@@ -17,10 +17,15 @@ export type QualificacaoFuncao = {
 
 // --- Pessoas ---
 
-export async function listPessoas(funcaoId?: number, incluirInativos?: boolean): Promise<Pessoa[]> {
+export async function listPessoas(
+  funcaoId?: number,
+  incluirInativos?: boolean,
+  ministerioId?: number,
+): Promise<Pessoa[]> {
   const params = new URLSearchParams()
   if (funcaoId != null) params.set('funcaoId', String(funcaoId))
   if (incluirInativos) params.set('incluirInativos', 'true')
+  if (ministerioId != null) params.set('ministerioId', String(ministerioId))
   const query = params.toString()
   const res = await fetch(`${BASE}/pessoa${query ? `?${query}` : ''}`)
   if (!res.ok) throw new Error('Erro ao buscar pessoas')
@@ -137,11 +142,16 @@ export async function removeIndisponivel(pessoaId: number, cultoId: number): Pro
   if (!res.ok) throw new Error('Erro ao remover indisponibilidade')
 }
 
-export async function findDisponibilidadesPorCulto(cultoId: number, funcaoId?: number): Promise<CultoDisponibilidadeItem[]> {
-  const url = funcaoId != null
-    ? `${BASE}/culto/${cultoId}/disponibilidades?funcaoId=${funcaoId}`
-    : `${BASE}/culto/${cultoId}/disponibilidades`
-  const res = await fetch(url)
+export async function findDisponibilidadesPorCulto(
+  cultoId: number,
+  funcaoId?: number,
+  ministerioId?: number,
+): Promise<CultoDisponibilidadeItem[]> {
+  const params = new URLSearchParams()
+  if (funcaoId != null) params.set('funcaoId', String(funcaoId))
+  if (ministerioId != null) params.set('ministerioId', String(ministerioId))
+  const query = params.toString()
+  const res = await fetch(`${BASE}/culto/${cultoId}/disponibilidades${query ? `?${query}` : ''}`)
   if (!res.ok) throw new Error('Erro ao buscar disponibilidades')
   return res.json()
 }
