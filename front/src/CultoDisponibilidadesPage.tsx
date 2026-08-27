@@ -3,10 +3,13 @@ import {
   findDisponibilidadesPorCulto,
   setIndisponivel,
   removeIndisponivel,
+  listMinisterios,
+  listFuncoesPorMinisterio,
   type Culto,
   type CultoDisponibilidadeItem,
+  type Ministerio,
+  type Funcao,
 } from './api'
-import { useLouvorFuncoes } from './useLouvorFuncoes'
 
 type Props = {
   culto: Culto
@@ -20,8 +23,28 @@ export default function CultoDisponibilidadesPage({ culto, onVoltar }: Props) {
   const [loadingPessoa, setLoadingPessoa] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [filtro, setFiltro] = useState<Filtro>('todos')
-  const { funcoes, error: funcoesError } = useLouvorFuncoes()
+
+  const [ministerios, setMinisterios] = useState<Ministerio[]>([])
+  const [ministerioId, setMinisterioId] = useState<number | null>(null)
+  const [funcoes, setFuncoes] = useState<Funcao[]>([])
   const [funcaoId, setFuncaoId] = useState<number | null>(null)
+
+  useEffect(() => {
+    listMinisterios()
+      .then(setMinisterios)
+      .catch(() => setError('Erro ao carregar ministérios.'))
+  }, [])
+
+  useEffect(() => {
+    setFuncaoId(null)
+    if (ministerioId === null) {
+      setFuncoes([])
+      return
+    }
+    listFuncoesPorMinisterio(ministerioId)
+      .then(setFuncoes)
+      .catch(() => setError('Erro ao carregar funções.'))
+  }, [ministerioId])
 
   useEffect(() => {
     setError(null)
@@ -72,24 +95,40 @@ export default function CultoDisponibilidadesPage({ culto, onVoltar }: Props) {
         {new Date(culto.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
       </p>
 
-      {(error ?? funcoesError) && (
+      {error && (
         <div className="mb-4 rounded-md bg-sand/20 border border-caramel px-4 py-3 text-sm text-espresso">
-          {error ?? funcoesError}
+          {error}
         </div>
       )}
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-navy mb-1">Função</label>
-        <select
-          className="w-full border border-mist rounded-md px-3 py-2 bg-white text-espresso focus:outline-none focus:ring-2 focus:ring-steel"
-          value={funcaoId ?? ''}
-          onChange={(e) => setFuncaoId(e.target.value ? Number(e.target.value) : null)}
-        >
-          <option value="">Todas</option>
-          {funcoes.map((f) => (
-            <option key={f.id} value={f.id}>{f.nome}</option>
-          ))}
-        </select>
+      <div className="mb-4 flex gap-2">
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-navy mb-1">Ministério</label>
+          <select
+            className="w-full border border-mist rounded-md px-3 py-2 bg-white text-espresso focus:outline-none focus:ring-2 focus:ring-steel"
+            value={ministerioId ?? ''}
+            onChange={(e) => setMinisterioId(e.target.value ? Number(e.target.value) : null)}
+          >
+            <option value="">Todos</option>
+            {ministerios.map((m) => (
+              <option key={m.id} value={m.id}>{m.nome}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-navy mb-1">Função</label>
+          <select
+            className="w-full border border-mist rounded-md px-3 py-2 bg-white text-espresso focus:outline-none focus:ring-2 focus:ring-steel disabled:opacity-50"
+            value={funcaoId ?? ''}
+            onChange={(e) => setFuncaoId(e.target.value ? Number(e.target.value) : null)}
+            disabled={ministerioId === null}
+          >
+            <option value="">Todas</option>
+            {funcoes.map((f) => (
+              <option key={f.id} value={f.id}>{f.nome}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="mb-4">
