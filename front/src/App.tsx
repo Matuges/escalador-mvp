@@ -1,45 +1,28 @@
-import { useState } from 'react'
-import DisponibilidadePage from './DisponibilidadePage'
-import PessoasPage from './PessoasPage'
-import CultosPage from './CultosPage'
-
-type Tab = 'disponibilidade' | 'pessoas' | 'cultos'
-
-const tabs: { id: Tab; label: string }[] = [
-  { id: 'disponibilidade', label: 'Disponibilidade' },
-  { id: 'pessoas', label: 'Pessoas' },
-  { id: 'cultos', label: 'Cultos' },
-]
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { AppLayout } from './components/AppLayout'
+import { EscalaPage } from './pages/EscalaPage'
+import { PessoasPage } from './pages/PessoasPage'
+import { PessoaDetailPage } from './pages/PessoaDetailPage'
+import { CadastrosLayout } from './pages/CadastrosLayout'
+import { CultosPage } from './pages/CultosPage'
+import { MinisteriosPage } from './pages/MinisteriosPage'
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>('disponibilidade')
-
   return (
-    <div className="min-h-screen bg-ivory">
-      <header className="bg-navy">
-        <div className="max-w-2xl mx-auto px-6 flex items-center gap-1 h-14">
-          <span className="font-bold text-white mr-4 tracking-wide">Escalador</span>
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`px-3 py-1 rounded-md text-sm transition-colors ${
-                tab === t.id
-                  ? 'bg-steel text-white'
-                  : 'text-mist hover:bg-white/10 hover:text-white'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto px-6 py-6">
-        {tab === 'disponibilidade' && <DisponibilidadePage />}
-        {tab === 'pessoas' && <PessoasPage />}
-        {tab === 'cultos' && <CultosPage />}
-      </main>
-    </div>
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route index element={<Navigate to="/escala" replace />} />
+        <Route path="escala" element={<EscalaPage />} />
+        <Route path="escala/:cultoId" element={<EscalaPage />} />
+        <Route path="pessoas" element={<PessoasPage />} />
+        <Route path="pessoas/:pessoaId" element={<PessoaDetailPage />} />
+        <Route path="cadastros" element={<CadastrosLayout />}>
+          <Route index element={<Navigate to="/cadastros/cultos" replace />} />
+          <Route path="cultos" element={<CultosPage />} />
+          <Route path="ministerios" element={<MinisteriosPage />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/escala" replace />} />
+      </Route>
+    </Routes>
   )
 }
