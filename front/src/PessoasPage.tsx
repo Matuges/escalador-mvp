@@ -11,6 +11,7 @@ import {
   type Ministerio,
   type Funcao,
 } from './api'
+import PessoaQualificacoesPage from './PessoaQualificacoesPage'
 
 export default function PessoasPage() {
   const [pessoas, setPessoas] = useState<Pessoa[]>([])
@@ -28,6 +29,8 @@ export default function PessoasPage() {
   const [newMinisterioId, setNewMinisterioId] = useState<number | null>(null)
   const [funcoesDoMinisterio, setFuncoesDoMinisterio] = useState<Funcao[]>([])
   const [newFuncaoId, setNewFuncaoId] = useState<number | null>(null)
+
+  const [pessoaSelecionada, setPessoaSelecionada] = useState<Pessoa | null>(null)
 
   useEffect(() => {
     listPessoas(funcaoId ?? undefined)
@@ -108,6 +111,15 @@ export default function PessoasPage() {
     } catch {
       setError('Erro ao excluir pessoa.')
     }
+  }
+
+  if (pessoaSelecionada) {
+    return (
+      <PessoaQualificacoesPage
+        pessoa={pessoaSelecionada}
+        onVoltar={() => setPessoaSelecionada(null)}
+      />
+    )
   }
 
   return (
@@ -224,7 +236,12 @@ export default function PessoasPage() {
               </>
             ) : (
               <>
-                <span className="flex-1 text-espresso">{p.nome}</span>
+                <span
+                  onClick={() => setPessoaSelecionada(p)}
+                  className="flex-1 text-espresso cursor-pointer hover:underline"
+                >
+                  {p.nome}
+                </span>
                 <button
                   onClick={() => startEdit(p)}
                   className="text-sm text-steel hover:text-navy"

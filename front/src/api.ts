@@ -7,6 +7,13 @@ export type CultoDisponibilidadeItem = { id: number; pessoa: string; disponivel:
 export type CultoPreview = { nome: string; data: string }
 export type Ministerio = { id: number; nome: string }
 export type Funcao = { id: number; nome: string; ministerioId: number }
+export type QualificacaoFuncao = {
+  id: number
+  funcao: string
+  ministerio: string
+  ministerioId: number
+  qualificado: boolean
+}
 
 // --- Pessoas ---
 
@@ -187,4 +194,15 @@ export async function deleteFuncao(id: number): Promise<void> {
 export async function setQualificacao(pessoaId: number, funcaoId: number): Promise<void> {
   const res = await fetch(`${BASE}/pessoa/${pessoaId}/qualificacao/${funcaoId}`, { method: 'PUT' })
   if (!res.ok) throw new Error('Erro ao associar função')
+}
+
+export async function removeQualificacao(pessoaId: number, funcaoId: number): Promise<void> {
+  const res = await fetch(`${BASE}/pessoa/${pessoaId}/qualificacao/${funcaoId}`, { method: 'DELETE' })
+  if (!res.ok) throw new Error('Erro ao remover função')
+}
+
+export async function listQualificacoes(pessoaId: number): Promise<QualificacaoFuncao[]> {
+  const res = await fetch(`${BASE}/pessoa/${pessoaId}/qualificacoes`)
+  if (!res.ok) throw new Error('Erro ao buscar qualificações')
+  return res.json()
 }
