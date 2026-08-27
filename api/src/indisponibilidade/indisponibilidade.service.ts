@@ -13,6 +13,7 @@ export class IndisponibilidadeService {
     });
   }
 
+  // Aqui ele usa deleteMany por idempotência, ou seja, se não existe, não faz nada.
   async removeIndisponibilidade(pessoaId: number, cultoId: number) {
     return this.prisma.indisponibilidade.deleteMany({
       where: {
