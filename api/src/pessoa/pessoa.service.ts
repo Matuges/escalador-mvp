@@ -15,10 +15,10 @@ export class PessoaService {
     });
   }
 
-  async findAll(funcaoId?: number) {
+  async findAll(funcaoId?: number, incluirInativos?: boolean) {
     return this.prisma.pessoa.findMany({
       where: {
-        ativo: true,
+        ...(incluirInativos ? undefined : { ativo: true }),
         ...(funcaoId !== undefined
           ? { qualificacoes: { some: { funcaoId } } }
           : undefined),
