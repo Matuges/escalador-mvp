@@ -43,6 +43,7 @@ export function PessoaDetailPage() {
   const [nome, setNome] = useState('')
 
   const [qualificacoes, setQualificacoes] = useState<QualificacaoFuncao[] | null>(null)
+  const [mostrarTodosMinisterios, setMostrarTodosMinisterios] = useState(false)
   const [disponibilidades, setDisponibilidades] = useState<DisponibilidadeItem[] | null>(null)
   const [ocupadoQual, setOcupadoQual] = useState<number | null>(null)
   const [ocupadoDisp, setOcupadoDisp] = useState<number | null>(null)
@@ -83,6 +84,12 @@ export function PessoaDetailPage() {
         funcoes: funcoes.sort((a, b) => a.funcao.localeCompare(b.funcao, 'pt-BR')),
       }))
   }, [qualificacoes])
+
+  const gruposComQualificacao = useMemo(
+    () => porMinisterio.filter((g) => g.funcoes.some((f) => f.qualificado)),
+    [porMinisterio],
+  )
+  const gruposVisiveis = mostrarTodosMinisterios ? porMinisterio : gruposComQualificacao
 
   const dispPorMes = useMemo(() => {
     const ordenadas = [...(disponibilidades ?? [])].sort(
@@ -247,28 +254,45 @@ export function PessoaDetailPage() {
             />
           ) : (
             <div className="space-y-3">
-              {porMinisterio.map((grupo) => (
-                <Card key={grupo.ministerio} className="p-4">
-                  <h2 className="mb-2 text-sm font-semibold text-navy">{grupo.ministerio}</h2>
-                  <div className="space-y-1">
-                    {grupo.funcoes.map((f) => (
-                      <label
-                        key={f.id}
-                        className="flex cursor-pointer items-center gap-2.5 rounded-md py-1 text-sm text-espresso"
-                      >
-                        <input
-                          type="checkbox"
-                          className="h-4 w-4 accent-steel"
-                          checked={f.qualificado}
-                          disabled={ocupadoQual === f.id}
-                          onChange={() => alternarQualificacao(f.id, f.qualificado)}
-                        />
-                        {f.funcao}
-                      </label>
-                    ))}
-                  </div>
-                </Card>
-              ))}
+              <div className="flex justify-end">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setMostrarTodosMinisterios((v) => !v)}
+                >
+                  {mostrarTodosMinisterios ? 'Ocultar outros ministérios' : 'Adicionar função'}
+                </Button>
+              </div>
+
+              {gruposVisiveis.length === 0 ? (
+                <EmptyState
+                  titulo="Nenhuma função ainda"
+                  descricao="Use “Adicionar função” para qualificar esta pessoa."
+                />
+              ) : (
+                gruposVisiveis.map((grupo) => (
+                  <Card key={grupo.ministerio} className="p-4">
+                    <h2 className="mb-2 text-sm font-semibold text-navy">{grupo.ministerio}</h2>
+                    <div className="space-y-1">
+                      {grupo.funcoes.map((f) => (
+                        <label
+                          key={f.id}
+                          className="flex cursor-pointer items-center gap-2.5 rounded-md py-1 text-sm text-espresso"
+                        >
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 accent-steel"
+                            checked={f.qualificado}
+                            disabled={ocupadoQual === f.id}
+                            onChange={() => alternarQualificacao(f.id, f.qualificado)}
+                          />
+                          {f.funcao}
+                        </label>
+                      ))}
+                    </div>
+                  </Card>
+                ))
+              )}
             </div>
           ))}
 
