@@ -5,7 +5,9 @@
 #    file_server
 # }
 
-http://localhost, escalador.icnvanil.com.br {
+# Hostname vem do env CADDY_SITE_ADDRESS (definido na /.env, passado pelo
+# docker-compose.yml). Local = http://localhost; VPS = escalador.icnvanil.com.br.
+{$CADDY_SITE_ADDRESS} {
     # A diretiva básica fora do "handle" protege todo o subdomínio de uma vez
     basicauth {
         admin {$ADMIN_PASSWORD_HASH}

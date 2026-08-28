@@ -81,6 +81,10 @@ web_modules/
 .env.production.local
 .env.local
 
+# Override local do Compose (extras de dev, ex: porta do Postgres no host).
+# Versionado só o .example. Nunca deve ir pra VPS.
+docker-compose.override.yml
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache

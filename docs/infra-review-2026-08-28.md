@@ -52,3 +52,35 @@ Tudo já commitado na branch `infra/manual-deploy-setup`:
 - `caf9428 Docker` (`.dockerignore`, `.env.example`, `docker-compose.yml`)
 
 Branch ainda não mergeada/pushada.
+
+## Resolução das pontas de configuração (2026-08-28)
+
+Feito depois do review, focado nas inconsistências de env/config (não nos itens
+de build/Node, que seguem em aberto):
+
+- **`api/.env.example`** — trocado o placeholder herdado do scaffold
+  (`.../sunshine`) por um template que bate com o compose (`root` / `escalador_db`),
+  com comentário explicando quando o arquivo é usado (API no host) e quando é
+  ignorado (API em container).
+- **`CADDY_SITE_ADDRESS`** — antes estava no `.env.example` mas não era lida em
+  lugar nenhum. Agora o `Caddyfile` usa `{$CADDY_SITE_ADDRESS}` no lugar do
+  `http://localhost, escalador.icnvanil.com.br` hardcoded, e o
+  `docker-compose.yml` passa a var pro serviço `caddy`. Resolve também o item
+  "cosmético" do review sobre misturar host de teste e domínio de produção no
+  mesmo bloco: agora é um valor por ambiente, vindo da `/.env`.
+- **`.dockerignore`** — o padrão `.env` só casava com a raiz; `api/.env` entrava
+  na imagem via `COPY . .` (a afirmação na seção "Segurança > Bom" acima estava
+  errada nesse ponto). Adicionado `**/.env`. Sem mudança de comportamento em
+  runtime — o `environment:` do compose já tinha precedência —, mas o segredo
+  não vai mais pra dentro da imagem.
+- **`docker-compose.override.yml`** — o review notou (corretamente) que tirar
+  `5432:5432` do Postgres é o certo pra VPS. Pra não perder o Cenário B de dev
+  (API no host contra banco em container), a porta voltou só via override local:
+  `docker-compose.override.yml.example` versionado, `docker-compose.override.yml`
+  no `.gitignore` e no `.dockerignore`. Nunca vai pra VPS.
+- **Documentação** — `README.md` reescrito com os dois cenários de teste local e
+  a tabela de "quem lê qual `.env`".
+
+Continua em aberto (não mexido aqui): imagem base Node 18 nos dois `Dockerfile`,
+`version: '3.8'` obsoleto, fallback `senha_local_padrao` do `DB_PASSWORD`,
+`CMD` em forma shell no `api/Dockerfile`.

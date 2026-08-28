@@ -1,0 +1,15 @@
+# Extras SÓ para desenvolvimento local. Copie para docker-compose.override.yml
+# (que é git-ignored) e o Compose vai mesclar automaticamente com o
+# docker-compose.yml em todo `docker compose ...`.
+#
+# Propósito: o docker-compose.yml base não publica a porta do Postgres no host
+# (correto para a VPS — só o Caddy fica exposto). Para rodar a API no host
+# (npm run start:dev) contra o banco em container, você precisa alcançar o
+# Postgres pelo localhost:5432 — é o que este override faz.
+#
+# Nunca copie este arquivo para a VPS.
+
+services:
+  postgres:
+    ports:
+      - "5432:5432"

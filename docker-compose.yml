@@ -9,6 +9,7 @@ services:
       - "443:443"
     environment:
       ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH}
+      CADDY_SITE_ADDRESS: ${CADDY_SITE_ADDRESS:-http://localhost}
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
       # - ../site-estatico:/var/www/site-estatico 
