@@ -5,7 +5,7 @@
 #    file_server
 # }
 
-escalador.icnvanil.com.br {
+http://localhost, escalador.icnvanil.com.br {
     # A diretiva básica fora do "handle" protege todo o subdomínio de uma vez
     basicauth {
         admin {$ADMIN_PASSWORD_HASH}
