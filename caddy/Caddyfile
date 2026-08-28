@@ -1,0 +1,24 @@
+# O site principal está comentado para evitar erros caso você teste na sua máquina.
+# Na VPS, se quiser rodá-lo, basta descomentar as linhas abaixo.
+# icnvanil.com.br {
+#    root * /var/www/site-estatico
+#    file_server
+# }
+
+escalador.icnvanil.com.br {
+    # A diretiva básica fora do "handle" protege todo o subdomínio de uma vez
+    basicauth {
+        admin {$ADMIN_PASSWORD_HASH}
+    }
+
+    # API: Agora protegida. Só quem tem a senha do Caddy consegue acessar
+    handle /api/* {
+        uri strip_prefix /api
+        reverse_proxy api:3000
+    }
+
+    # FRONT: O React inteiro bloqueado
+    handle {
+        reverse_proxy front:80
+    }
+}
