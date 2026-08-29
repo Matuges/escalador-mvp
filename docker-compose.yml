@@ -1,15 +1,48 @@
+
 services:
-  db:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH}
+      CADDY_SITE_ADDRESS: ${CADDY_SITE_ADDRESS:-http://localhost}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      # - ../site-estatico:/var/www/site-estatico 
+      - caddy_data:/data
+      - caddy_config:/config
+
+    
+  postgres:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: sunshine
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: escalador_db
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://root:${DB_PASSWORD}@postgres:5432/escalador_db
+    depends_on:
+      - postgres
+
+  front:
+    build:
+      context: .
+      dockerfile: front/Dockerfile
+    restart: unless-stopped
 
 volumes:
-  pgdata:
+  postgres_data:
+  caddy_data:
+  caddy_config:

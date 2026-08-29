@@ -1,0 +1,11 @@
+node_modules
+*/node_modules
+dist
+build
+.git
+
+# Segredos: nunca entram na imagem via `COPY . .`.
+# `.env` cobre a raiz; `**/.env` cobre api/.env, front/.env etc.
+.env
+**/.env
+docker-compose.override.yml
