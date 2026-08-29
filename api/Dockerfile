@@ -17,4 +17,4 @@ RUN npm run build --workspace=api
 
 EXPOSE 3000
 
-CMD npx prisma migrate deploy --schema=./api/prisma/schema.prisma && node api/dist/main.js
+CMD sh -c 'echo "DATABASE_URL=$DATABASE_URL" > /app/api/.env && cd /app/api && npx prisma migrate deploy && node /app/api/dist/src/main.js'
