@@ -53,23 +53,29 @@ Também foi construído, fora do escopo original do MVP mas necessário e para m
 
 ## Fase atual — desenvolvimento por sprints
 
-Estamos indo de "registrar disponibilidade" para o sistema de escalas de verdade, em sprints pequenos com protótipo demonstrável ao final de cada um. A lógica: primeiro construir camadas de qualidade de vida (exibição filtrada, montagem manual de escala) sobre um schema mais completo; só depois — se/quando fizer sentido — um gerador automático passa a consumir esses mesmos dados.
+Estamos indo de "registrar disponibilidade" para o sistema de escalas de verdade, em sprints pequenos com protótipo demonstrável ao final de cada um. A ordem foi reorganizada: antes de investir em Alocação/montador, queremos validar a captura de disponibilidade com uso real, porque só rodando um ciclo de verdade dá pra descobrir requisitos que não têm como prever de antemão (disponibilidade parcial? campo de observação? granularidade certa?).
 
-**Sprint 1 (atual):**
-- Schema: adicionar `Ministério`, `Função` e `Qualificação` (pessoa ↔ função que pode exercer).
-- Exibição filtrada: pessoas disponíveis para um culto, filtradas por ministério e função específicos.
+**Já entregue:**
+- Schema: `Ministério`, `Função` e `Qualificação` (pessoa ↔ função que pode exercer).
+- Exibição filtrada: pessoas disponíveis para um culto, filtradas por ministério e função específicos (e o inverso, disponibilidade de uma pessoa por culto).
+- RF01-04 (cadastros de pessoa, ministério/função, qualificação, culto) + indisponibilidade.
 
-**Sprint 2:**
-- Schema: `Alocação` (pessoa + culto + função) — é o registro por trás do montador manual de escala.
+**Próximo (novo topo):**
+- Captura pública "pobre": subset de RF05-13 sem infra de token — página pública onde a pessoa seleciona o próprio nome, marca os cultos em que está indisponível, e envia. ~3-4 dias.
+
+**Depois — rodar o ciclo real e iterar:**
+- Usar o form pobre num ciclo de verdade para descobrir o que faltou prever (granularidade de disponibilidade, campos extras, etc.) antes de endurecer o formulário.
+
+**Fast-follow:**
+- Endurecer com token (resto de RF05-13: link individual, prazo, invalidação), já sabendo o formato certo depois da iteração acima.
+
+**Fim da fila (antigos Sprints 2/3/4 — é quando um gerador automático passaria a fazer sentido):**
+- Schema: `Alocação` (pessoa + culto + função) — registro por trás do montador manual de escala.
 - RF17 (demanda de cada função por tipo de culto), para mostrar quota no montador (ex: "faltam 2 vocalistas").
-
-**Sprint 3:**
 - Schema: `Ciclo` (agrupa cultos num período) + histórico de escalas entre ciclos (RF27/28).
+- RF14 (teto de escalas por pessoa), RF15/16 (pares que devem/devem evitar servir juntos), RF18/19 (fixação manual, indisponibilidade recorrente), conforme o montador se aproxima. Não modelar antes disso: sem gerador/montador consumindo essas regras, são campos sem uso.
 
-**Sprint 4 (mais à frente — é quando um gerador automático passaria a fazer sentido):**
-- RF14 (teto de escalas por pessoa) e RF15/16 (pares que devem/devem evitar servir juntos). Não modelar antes disso: sem gerador consumindo essas regras, são campos sem uso.
-
-**Fora do horizonte por enquanto** (não implementar sem decisão explícita): formulário público por token (RF05-13), geração automática de escala + escalas candidatas (RF20-26), exportação como imagem/planilha (RF29-31).
+**Fora do horizonte por enquanto** (não implementar sem decisão explícita): geração automática de escala + escalas candidatas (RF20-26), exportação como imagem/planilha (RF29-31).
 
 ## Stack:
 
