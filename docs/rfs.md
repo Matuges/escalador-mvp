@@ -6,7 +6,7 @@ RF02 — O sistema deve permitir cadastrar ministérios e suas funções.
 RF03 — O sistema deve permitir registrar as qualificações de cada pessoa (em quais funções ela pode servir).
 RF04 — O sistema deve permitir cadastrar tipos de culto recorrentes e eventos pontuais.
 ## Formulário mensal de disponibilidade
-RF05 — O sistema deve gerar um link individual por token para cada pessoa a cada ciclo.
+RF05 — O sistema deve gerar um link individual por token para cada pessoa a cada ciclo. (DESCARTADO)
 RF06 — O sistema deve permitir que a pessoa informe sua disponibilidade sem necessidade de login, apenas selecionando o próprio nome.
 RF07 — O formulário deve exibir as datas do ciclo em que a pessoa pode ser escalada.
 RF08 — O sistema deve permitir marcar indisponibilidade por data.
@@ -14,7 +14,7 @@ RF09 — O sistema deve registrar a data/hora de envio da resposta.
 RF10 — O sistema deve permitir que a pessoa reenvie/atualize sua resposta enquanto o prazo estiver aberto.
 RF11 — O sistema deve indicar ao administrador quem já respondeu e quem está pendente.
 RF12 — O sistema deve respeitar um prazo de resposta definido pelo administrador.
-RF13 — O sistema deve invalidar o token após o encerramento do ciclo.
+RF13 — O sistema deve invalidar o token após o encerramento do ciclo. (DESCARTADO)
 ## Regras de customização
 RF14 — O sistema deve permitir definir um teto de escalas por pessoa no ciclo.
 RF15 — O sistema deve permitir registrar pares de pessoas que devem servir juntas.
