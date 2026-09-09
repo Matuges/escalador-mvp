@@ -20,7 +20,7 @@ model Pessoa {
 
   qualificacoes Qualificacao[]
   indisponibilidades Indisponibilidade[]
-  respostaDisponibilidade RespostaDisponibilidade[]
+  respostaDisponibilidade RespostaDisponibilidade?
 
   @@map("pessoa")
 }
