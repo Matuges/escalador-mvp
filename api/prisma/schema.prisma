@@ -20,6 +20,7 @@ model Pessoa {
 
   qualificacoes Qualificacao[]
   indisponibilidades Indisponibilidade[]
+  respostaDisponibilidade RespostaDisponibilidade[]
 
   @@map("pessoa")
 }
@@ -72,4 +73,23 @@ model Qualificacao {
 
   @@map("qualificacao")
   @@id([pessoaId, funcaoId])
+}
+
+model RespostaDisponibilidade {
+  id        Int      @id @default(autoincrement())
+  pessoa    Pessoa   @relation(fields: [pessoaId], references: [id])
+  pessoaId  Int      @unique
+  enviadoEm DateTime @updatedAt        
+  criadoEm  DateTime @default(now())
+
+  @@map("resposta_disponibilidade")
+}
+
+model ConfiguracaoFormulario {
+  id           Int      @id @default(1)   // singleton — sempre 1
+  diaCorte     Int      @default(20)      // 1–28 (§4)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@map("configuracao_formulario")
 }
