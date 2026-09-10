@@ -5,5 +5,6 @@ import { IndisponibilidadeController } from './indisponibilidade.controller';
 @Module({
   controllers: [IndisponibilidadeController],
   providers: [IndisponibilidadeService],
+  exports: [IndisponibilidadeService],
 })
 export class IndisponibilidadeModule {}

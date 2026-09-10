@@ -19,6 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { PessoaService } from './pessoa.service';
+import { IndisponibilidadeService } from '../indisponibilidade/indisponibilidade.service';
 import { CreatePessoaDto } from './dto/create-pessoa.dto';
 import { UpdatePessoaDto } from './dto/update-pessoa.dto';
 import { Pessoa } from './entities/pessoa.entity';
@@ -28,7 +29,10 @@ import { QualificacaoFuncaoDto } from './dto/qualificacao-funcao.dto';
 @ApiTags('pessoa')
 @Controller('pessoa')
 export class PessoaController {
-  constructor(private readonly pessoaService: PessoaService) {}
+  constructor(
+    private readonly pessoaService: PessoaService,
+    private readonly indisponibilidadeService: IndisponibilidadeService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Cria uma pessoa' })
@@ -116,7 +120,7 @@ export class PessoaController {
   @ApiParam({ name: 'id', type: Number })
   @ApiOkResponse({ type: DisponibilidadeCultoDto, isArray: true })
   async findDisponibilidade(@Param('id', ParseIntPipe) id: number) {
-    return this.pessoaService.findDisponibilidade(id);
+    return this.indisponibilidadeService.findPorPessoa(id);
   }
 
   @Get(':id/qualificacoes')

@@ -42,7 +42,7 @@ export class CultoService {
     });
   }
 
-  gerarCultosDoMes(ano: number, mes: number) {
+  async gerarCultosDoMes(ano: number, mes: number) {
     const diasNoMes = new Date(ano, mes, 0).getDate();
     const cultos: { nome: string; data: Date }[] = [];
     let sabado = 0;
@@ -80,39 +80,17 @@ export class CultoService {
     return cultos;
   }
 
-  salvarCultosDoMes(ano: number, mes: number) {
-    const cultos = this.gerarCultosDoMes(ano, mes);
+  async salvarCultosDoMes(ano: number, mes: number) {
+    const cultos = await this.gerarCultosDoMes(ano, mes);
     return this.prisma.culto.createMany({
       data: cultos,
     });
   }
 
-  async findDisponibilidade(
-    id: number,
-    funcaoId?: number,
-    ministerioId?: number,
-  ) {
-    const filtroQualificacao =
-      funcaoId !== undefined
-        ? { some: { funcaoId } }
-        : ministerioId !== undefined
-          ? { some: { funcao: { ministerioId } } }
-          : undefined;
-    const pessoas = await this.prisma.pessoa.findMany({
-      where: filtroQualificacao
-        ? { qualificacoes: filtroQualificacao }
-        : undefined,
-      include: {
-        indisponibilidades: {
-          where: { cultoId: id },
-        },
-      },
-    });
-
-    return pessoas.map((pessoa) => ({
-      pessoa: pessoa.nome,
-      id: pessoa.id,
-      disponivel: pessoa.indisponibilidades.length === 0,
-    }));
+  async listarPorIntervalo(inicio: Date, fim: Date) {
+    return this.prisma.culto.findMany({
+      where: {data: {gte: inicio, lt: fim}},
+      orderBy: {data: "asc"}
+    })
   }
 }

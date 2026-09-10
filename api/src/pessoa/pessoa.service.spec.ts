@@ -194,46 +194,6 @@ describe('PessoaService', () => {
     expect(resultado).toEqual(pessoa);
   });
 
-  it('should find disponibilidades', async () => {
-    const id = 1;
-
-    const cultos = [
-      {
-        id: 1,
-        nome: 'Manha',
-        data: '21/08/2026',
-        indisponibilidades: [{ pessoaId: 1, cultoId: 1 }],
-      },
-      {
-        id: 2,
-        nome: 'Noite',
-        data: '21/08/2026',
-        indisponibilidades: [{ pessoaId: 2, cultoId: 2 }],
-      },
-    ];
-
-    prisma.culto.findMany.mockResolvedValue(cultos);
-
-    const resultado = await service.findDisponibilidade(id);
-
-    expect(prisma.culto.findMany).toHaveBeenCalledWith({
-      include: {
-        indisponibilidades: {
-          where: { pessoaId: id },
-        },
-      },
-    });
-
-    expect(resultado).toEqual(
-      cultos.map((culto) => ({
-        culto: culto.nome,
-        id: culto.id,
-        data: culto.data,
-        disponivel: culto.indisponibilidades.length === 0,
-      })),
-    );
-  });
-
   it('should find qualificacoes', async () => {
     const id = 1;
 
