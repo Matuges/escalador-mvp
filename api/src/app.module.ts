@@ -8,6 +8,7 @@ import { CultoModule } from './culto/culto.module';
 import { QualificacaoModule } from './qualificacao/qualificacao.module';
 import { MinisterioModule } from './ministerio/ministerio.module';
 import { FuncaoModule } from './funcao/funcao.module';
+import { ConfiguracaoFormularioModule } from './configuracao-formulario/configuracao-formulario.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { FuncaoModule } from './funcao/funcao.module';
     QualificacaoModule,
     MinisterioModule,
     FuncaoModule,
+    ConfiguracaoFormularioModule,
   ],
   controllers: [AppController],
   providers: [AppService],
