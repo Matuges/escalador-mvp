@@ -18,6 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CultoService } from './culto.service';
+import { IndisponibilidadeService } from '../indisponibilidade/indisponibilidade.service';
 import { CreateCultoDto } from './dto/create-culto.dto';
 import { UpdateCultoDto } from './dto/update-culto.dto';
 import { MesCultoDto } from './dto/mes-culto.dto';
@@ -29,7 +30,10 @@ import { DisponibilidadePessoaDto } from './dto/disponibilidade-pessoa.dto';
 @ApiTags('culto')
 @Controller('culto')
 export class CultoController {
-  constructor(private readonly cultoService: CultoService) {}
+  constructor(
+    private readonly cultoService: CultoService,
+    private readonly indisponibilidadeService: IndisponibilidadeService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Cria um culto' })
@@ -127,6 +131,6 @@ export class CultoController {
     @Query('ministerioId', new ParseIntPipe({ optional: true }))
     ministerioId?: number,
   ) {
-    return this.cultoService.findDisponibilidade(id, funcaoId, ministerioId);
+    return this.indisponibilidadeService.findPorCulto(id, funcaoId, ministerioId);
   }
 }

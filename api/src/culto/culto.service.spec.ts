@@ -126,8 +126,8 @@ describe('CultoService', () => {
     expect(resultado).toEqual(culto);
   });
 
-  it('should generate the cultos for a given month', () => {
-    const resultado = service.gerarCultosDoMes(2026, 8);
+  it('should generate the cultos for a given month', async () => {
+    const resultado = await service.gerarCultosDoMes(2026, 8);
 
     expect(resultado).toHaveLength(16);
     expect(
@@ -158,121 +158,17 @@ describe('CultoService', () => {
     );
   });
 
-  it('should save the cultos generated for the month', () => {
-    const cultosGerados = service.gerarCultosDoMes(2026, 8);
+  it('should save the cultos generated for the month', async () => {
+    const cultosGerados = await service.gerarCultosDoMes(2026, 8);
     prisma.culto.createMany.mockResolvedValue({ count: cultosGerados.length });
 
-    const resultado = service.salvarCultosDoMes(2026, 8);
+    const resultado = await service.salvarCultosDoMes(2026, 8);
 
     expect(prisma.culto.createMany).toHaveBeenCalledWith({
       data: cultosGerados,
     });
-    return expect(resultado).resolves.toEqual({ count: cultosGerados.length });
+    expect(resultado).toEqual({ count: cultosGerados.length });
   });
 
-  it('should find disponibilidades for a culto', async () => {
-    const id = 1;
-    const pessoas = [
-      { id: 1, nome: 'Maria', indisponibilidades: [] },
-      {
-        id: 2,
-        nome: 'João',
-        indisponibilidades: [{ pessoaId: 2, cultoId: 1 }],
-      },
-    ];
-    prisma.pessoa.findMany.mockResolvedValue(pessoas);
-
-    const resultado = await service.findDisponibilidade(id);
-
-    expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
-      include: {
-        indisponibilidades: {
-          where: { cultoId: id },
-        },
-      },
-    });
-
-    expect(resultado).toEqual(
-      pessoas.map((pessoa) => ({
-        pessoa: pessoa.nome,
-        id: pessoa.id,
-        disponivel: pessoa.indisponibilidades.length === 0,
-      })),
-    );
-  });
-
-  it('should find disponibilidades for a culto filtered by funcao', async () => {
-    const id = 1;
-    const funcaoId = 2;
-    const pessoas = [{ id: 1, nome: 'Maria', indisponibilidades: [] }];
-    prisma.pessoa.findMany.mockResolvedValue(pessoas);
-
-    const resultado = await service.findDisponibilidade(id, funcaoId);
-
-    expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
-      where: { qualificacoes: { some: { funcaoId } } },
-      include: {
-        indisponibilidades: {
-          where: { cultoId: id },
-        },
-      },
-    });
-
-    expect(resultado).toEqual(
-      pessoas.map((pessoa) => ({
-        pessoa: pessoa.nome,
-        id: pessoa.id,
-        disponivel: pessoa.indisponibilidades.length === 0,
-      })),
-    );
-  });
-
-  it('should find disponibilidades for a culto filtered by ministerio', async () => {
-    const id = 1;
-    const ministerioId = 3;
-    const pessoas = [{ id: 1, nome: 'Maria', indisponibilidades: [] }];
-    prisma.pessoa.findMany.mockResolvedValue(pessoas);
-
-    const resultado = await service.findDisponibilidade(
-      id,
-      undefined,
-      ministerioId,
-    );
-
-    expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
-      where: { qualificacoes: { some: { funcao: { ministerioId } } } },
-      include: {
-        indisponibilidades: {
-          where: { cultoId: id },
-        },
-      },
-    });
-
-    expect(resultado).toEqual(
-      pessoas.map((pessoa) => ({
-        pessoa: pessoa.nome,
-        id: pessoa.id,
-        disponivel: pessoa.indisponibilidades.length === 0,
-      })),
-    );
-  });
-
-  it('should prefer funcaoId over ministerioId when both are given', async () => {
-    const id = 1;
-    const funcaoId = 2;
-    const ministerioId = 3;
-    const pessoas = [{ id: 1, nome: 'Maria', indisponibilidades: [] }];
-    prisma.pessoa.findMany.mockResolvedValue(pessoas);
-
-    await service.findDisponibilidade(id, funcaoId, ministerioId);
-
-    expect(prisma.pessoa.findMany).toHaveBeenCalledWith({
-      where: { qualificacoes: { some: { funcaoId } } },
-      include: {
-        indisponibilidades: {
-          where: { cultoId: id },
-        },
-      },
-    });
-  });
 });
+
